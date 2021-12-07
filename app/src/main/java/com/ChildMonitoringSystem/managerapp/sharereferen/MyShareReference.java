@@ -24,9 +24,4 @@ public class MyShareReference {
         SharedPreferences sharedPreferences = mContext.getSharedPreferences(MY_SHARE,0);
         return sharedPreferences.getString(key,"");
     }
-    public String getValueString11(String key)
-    {
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(MY_SHARE,0);
-        return sharedPreferences.getString(key,"");
-    }
 }
