@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:background="@color/colorMenuBackground">
+    <ImageView
+        android:id="@+id/idIBBackMenu"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/colorMenuBackground"
+        android:src="@drawable/ic_baseline_arrow_back_24"/>
+    <FrameLayout
+        android:id="@+id/framelayoutMonitorManage"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"/>
+    <RelativeLayout
+        android:layout_marginTop="10dp"
+        android:padding="10dp"
+        android:visibility="visible"
+        android:id="@+id/idLLShowInfomation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tv1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:gravity="center"
+            android:text="Thông Tin Điện Thoại Được Giám Sát"
+            android:textColor="@color/black"
+            android:fontFamily="@font/quicksand_bold"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/tv1"
+            android:background="@color/black" />
+        <LinearLayout
+            android:layout_below="@+id/tv1"
+            android:id="@+id/ll1"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:fontFamily="@font/quicksand_medium"
+                android:text="Tên người được đăng ký giám sát:"/>
+            <TextView
+                android:id="@+id/idTVNameSpy"
+                android:text="An"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:fontFamily="@font/quicksand_medium"
+                android:textSize="18sp" />
+            <View
+                android:layout_below="@+id/tv1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_below="@+id/ll1"
+            android:id="@+id/ll2"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:text="Tên Kiểu Điện Thoại:"/>
+        <TextView
+            android:id="@+id/idTVModel"
+            android:gravity="center"
+            android:text="Redmi Note 7"
+            android:fontFamily="@font/quicksand_medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+            <View
+                android:layout_below="@+id/tv1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black"/>
+    </LinearLayout>
+        <LinearLayout
+            android:layout_below="@+id/ll2"
+            android:id="@+id/ll3"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:fontFamily="@font/quicksand_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:text="Tên Điện Thoại:"/>
+            <TextView
+                android:text="xiaomi"
+                android:gravity="center"
+                android:fontFamily="@font/quicksand_medium"
+                android:id="@+id/idTVBrand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+            <View
+                android:layout_below="@+id/tv1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_below="@+id/ll3"
+            android:id="@+id/ll4"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:fontFamily="@font/quicksand_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:text="Tên Mã Sản Phẩm:"/>
+            <TextView
+                android:text="lavender"
+                android:gravity="center"
+                android:id="@+id/idTVProduct"
+                android:fontFamily="@font/quicksand_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+            <View
+                android:layout_below="@+id/tv1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_below="@+id/ll4"
+            android:id="@+id/ll5"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:fontFamily="@font/quicksand_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:text="Ngày đăng ký giám sát:"/>
+            <TextView
+                android:text="12-4-2021"
+                android:gravity="center"
+                android:id="@+id/idTVDtae"
+                android:fontFamily="@font/quicksand_medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+            <View
+                android:layout_below="@+id/tv1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black"/>
+        </LinearLayout>
+        <Button
+            android:layout_below="@+id/ll5"
+            android:id="@+id/idBTCancelMonitor"
+            android:layout_marginTop="10dp"
+            android:text="Hủy Giám Sát"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+
+</LinearLayout>

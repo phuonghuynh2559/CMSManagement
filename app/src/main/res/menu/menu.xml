@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_contact"
+            android:title="Danh bạ"
+            android:icon="@drawable/ic_baseline_contacts_24" />
+        <item android:id="@+id/nav_history"
+            android:title="Nhật ký cuộc gọi"
+            android:icon="@drawable/ic_baseline_contact_phone_24" />
+        <item android:id="@+id/nav_inbox"
+            android:title="Tin nhắn"
+            android:icon="@drawable/ic_baseline_mode_comment_24" />
+        <item android:id="@+id/nav_image"
+            android:title="Hình ảnh"
+            android:icon="@drawable/ic_baseline_image_24" />
+        <item android:id="@+id/nav_video"
+            android:title="Video"
+            android:icon="@drawable/ic_baseline_video_library_24" />
+        <item android:id="@+id/nav_location"
+            android:title="Vị trí"
+            android:icon="@drawable/ic_baseline_location_on_24" />
+        <item android:id="@+id/nav_app"
+            android:title="Ứng dụng được cài đặt"
+            android:icon="@drawable/ic_get_app" />
+        <item android:id="@+id/nav_audio"
+            android:title="Ghi âm"
+            android:icon="@drawable/ic_audio_file_24" />
+        <item android:id="@+id/nav_User_Manual"
+            android:title="Hướng dẫn"
+            android:icon="@drawable/ic_support_24"
+            />
+    </group>
+    <item android:title="Quản Lý">
+        <menu>
+            <item android:id="@+id/nav_monitor"
+                android:title="Quản lý thiết bị giám sát"
+                android:icon="@drawable/ic_baseline_smartphone_24"/>
+            <item android:id="@+id/nav_account"
+                android:title="Quản lý tài khoản"
+                android:icon="@drawable/ic_baseline_account_circle_24"/>
+            <item android:id="@+id/nav_log_out"
+                android:title="Đăng xuất"
+                android:icon="@drawable/ic_baseline_reply_24"/>
+        </menu>
+    </item>
+</menu>
