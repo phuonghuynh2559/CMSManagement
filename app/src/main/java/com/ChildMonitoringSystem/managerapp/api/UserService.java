@@ -9,6 +9,7 @@ import com.ChildMonitoringSystem.managerapp.models.HistorySignin;
 import com.ChildMonitoringSystem.managerapp.models.Images;
 import com.ChildMonitoringSystem.managerapp.models.Inbox;
 import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
+import com.ChildMonitoringSystem.managerapp.models.LocationOffline;
 import com.ChildMonitoringSystem.managerapp.models.PhoneNameInbox;
 import com.ChildMonitoringSystem.managerapp.models.User;
 import com.ChildMonitoringSystem.managerapp.models.UserRequest;
@@ -16,11 +17,8 @@ import com.ChildMonitoringSystem.managerapp.models.Video;
 
 import java.util.List;
 
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -72,4 +70,10 @@ public interface UserService
     Call<List<Video>>getListVideo(@Query("seri") String seriPhone);
     @GET("Home/api/getinformation")
     Call<InfomationPhone>getInfo(@Query("seri") String seriPhone);
+    // History login
+    @GET("Home/api/getHL")
+    Call<List<HistorySignin>>getLoginHistory(@Query("num") String phoneNumber);
+    //Get location
+    @GET("Home/api/GetLocation")
+    Call<List<LocationOffline>>getLocation(@Query("seri")String seriPhone);
 }

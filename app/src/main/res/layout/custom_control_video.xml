@@ -12,12 +12,12 @@
 
         <ImageView
             android:id="@+id/idIBOutDL"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_baseline_arrow_back_24" />
 
         <LinearLayout
-            android:id="@+id/idLLDownloadDL"
+            android:id="@+id/idLLDeleteVideo"
             android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -27,14 +27,16 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="10dp"
-                android:src="@drawable/ic_file_download_24" />
+                android:src="@drawable/ic_delete_24" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Lưu Video"
-                android:textColor="@color/black"
+                android:fontFamily="@font/quicksand_bold"
+                android:textSize="18sp"
+                android:text="Xóa Video"
+                android:textColor="@color/colorRed"
                 android:textStyle="bold" />
         </LinearLayout>
     </RelativeLayout>

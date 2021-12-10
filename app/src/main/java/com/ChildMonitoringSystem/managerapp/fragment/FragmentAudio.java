@@ -28,16 +28,21 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.ChildMonitoringSystem.managerapp.MainActivity;
 import com.ChildMonitoringSystem.managerapp.R;
 import com.ChildMonitoringSystem.managerapp.adapter.AudioAdapter;
+import com.ChildMonitoringSystem.managerapp.adapter.InfomationPhoneAdapter;
 import com.ChildMonitoringSystem.managerapp.api.APIClient;
 import com.ChildMonitoringSystem.managerapp.constan.Constan;
 import com.ChildMonitoringSystem.managerapp.models.Audio;
+import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickAudioListener;
+import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
+import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
 
 import java.util.List;
@@ -50,14 +55,15 @@ import retrofit2.Response;
 public class FragmentAudio extends Fragment {
     private View mView, viewDialog;
     private MainActivity mMainActivity;
-    private ImageButton idIBBackMenu;
-    private RecyclerView rcvAudio;
-    private GridLayoutManager gridLayoutManager;
+    private ImageView idIBBackMenu;
+    private RecyclerView rcvAudio, rcv_InfoPhone;
     private AudioAdapter audioAdapter;
     private Dialog dialog;
-    private TextView idTVOpenFolder;
     private ImageView idIVNoData;
     private Dialog dialogProcessbar;
+    private InfomationPhoneAdapter infomationPhoneAdapter;
+    private MyShareReference myShareReference;
+    private String phoneNumber;
 
     private TextView tvPlayerPosition,tvPlayerDuration, idTVNameAudio;
     private ImageView btRew,btPlay,btPause,btFf;
@@ -67,7 +73,7 @@ public class FragmentAudio extends Fragment {
     private MediaPlayer mediaPlayer;
     private Handler handler = new Handler();
     private Runnable runnable;
-    private String namePhone = "";
+    private String namePhone;
     public FragmentAudio() {
     }
     @Override
@@ -75,25 +81,65 @@ public class FragmentAudio extends Fragment {
                              Bundle savedInstanceState) {
         dialogProcessbar = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_audio, container, false);
+        myShareReference = new MyShareReference(getContext());
+        phoneNumber = myShareReference.getValueString("phoneNumber");
+
         mMainActivity= (MainActivity) getActivity();
         mMainActivity.getToolbar().setTitle("Ghi Âm");
+
         idIBBackMenu = mView.findViewById(R.id.idIBBackMenu);
-        //idTVOpenFolder = mView.findViewById(R.id.idTVOpenFolder);
         rcvAudio = mView.findViewById(R.id.rcv_Audio);
+        rcv_InfoPhone = mView.findViewById(R.id.rcv_InfoPhone);
         idIVNoData = mView.findViewById(R.id.idIVNoData);
+
+        infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rcv_InfoPhone.setLayoutManager(gridLayoutManager);
+        loadListPhoneMonitor(phoneNumber);
+
         audioAdapter = new AudioAdapter(getContext());
         gridLayoutManager = new GridLayoutManager(getContext(), 3);
         rcvAudio.setLayoutManager(gridLayoutManager);
-        loadFrameLayout();
+
         backMenu();
-        //openFolderDownload();
+
         return mView;
     }
-    private void loadFrameLayout(){
-        FragmentInfomationPhone infomationPhone = new FragmentInfomationPhone();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.framelayoutAudio,infomationPhone);
-        fragmentTransaction.commit();
+
+    private void loadListPhoneMonitor(String phoneNumber) {
+        APIClient.getUserService().getListInfoPhone(phoneNumber).enqueue(new Callback<List<InfomationPhone>>() {
+            @Override
+            public void onResponse(Call<List<InfomationPhone>> call, Response<List<InfomationPhone>> response) {
+                if (response.isSuccessful()) {
+                    List<InfomationPhone> mList = response.body();
+                    if (mList.size() == 0) {
+                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
+                            @Override
+                            public void onClickGoToMenu(InfomationPhone phone) {
+                                CustomProgess.OpenDialog(Gravity.CENTER, dialogProcessbar);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getListAudio(phone.getSERI_PHONE());
+                                    }
+                                }, 1000);
+                                namePhone = phone.getNAME_SPY();
+                            }
+
+                        });
+                        rcv_InfoPhone.setAdapter(infomationPhoneAdapter);
+                    }
+                } else {
+                }
+            }
+            @Override
+            public void onFailure(Call<List<InfomationPhone>> call, Throwable t) {
+
+            }
+        });
     }
 
     private void backMenu(){
@@ -106,46 +152,6 @@ public class FragmentAudio extends Fragment {
                 fragmentTransaction.commit();
             }
         });
-    }
-    private void openFolderDownload() {
-        idTVOpenFolder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String path = Environment.getExternalStorageDirectory()+"/Download/";
-                Uri uri = Uri.parse(path);
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setDataAndType(uri,"*/*");
-                startActivity(intent);
-            }
-        });
-    }
-    private BroadcastReceiver seriPhone = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(Constan.Action.equals(intent.getAction())){
-                String seri = intent.getStringExtra("seriPhone");
-                namePhone = intent.getStringExtra("namePhone");
-                CustomProgess.OpenDialog(Gravity.CENTER,dialogProcessbar);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getListAudio(seri);
-                    }
-                },1000);
-
-            }
-        }
-    };
-    @Override
-    public void onStart() {
-        super.onStart();
-        IntentFilter intentFilter = new IntentFilter(Constan.Action);
-        requireActivity().registerReceiver(seriPhone,intentFilter);
-    }
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        requireActivity().unregisterReceiver(seriPhone);
     }
     private void getListAudio(String seriPhone){
         Call<List<Audio>> getAudio = APIClient.getUserService().getAudio(seriPhone);

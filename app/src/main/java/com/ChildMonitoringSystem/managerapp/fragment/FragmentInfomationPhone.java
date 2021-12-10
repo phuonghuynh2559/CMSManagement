@@ -24,6 +24,7 @@ import com.ChildMonitoringSystem.managerapp.api.APIClient;
 import com.ChildMonitoringSystem.managerapp.constan.Constan;
 import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
+import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 
 import java.util.List;
 
@@ -36,11 +37,15 @@ public class FragmentInfomationPhone extends Fragment {
     private RecyclerView rcvInfoPhone;
     private TextView textView;
     private InfomationPhoneAdapter infomationPhoneAdapter;
+    private MyShareReference myShareReference;
+    private String phoneNumber;
     private MainActivity mMainActivity;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view  = inflater.inflate(R.layout.fragment_infomation_phone, container,false);
+        myShareReference = new MyShareReference(getContext());
+        phoneNumber = myShareReference.getValueString("phoneNumber");
         rcvInfoPhone=view.findViewById(R.id.rcv_InfoPhone);
         textView = view.findViewById(R.id.textviewIP);
         infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
@@ -51,8 +56,7 @@ public class FragmentInfomationPhone extends Fragment {
         rcvInfoPhone.addItemDecoration(itemDecoration);
         mMainActivity = (MainActivity)getActivity();
         assert mMainActivity != null;
-        String phoneNB = mMainActivity.getPhoneNumber();
-        getInfomationPhone(phoneNB);
+        getInfomationPhone(phoneNumber);
         return view;
     }
     private void getInfomationPhone(String phoneUser){

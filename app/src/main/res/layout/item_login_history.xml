@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginTop="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_inbox_mess">
+
+        <ImageView
+            android:id="@+id/idIVHistory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_history_24" />
+
+        <TextView
+            android:id="@+id/idTVDateHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_toEndOf="@id/idIVHistory"
+            android:fontFamily="@font/quicksand_medium"
+            android:text="ngày đăng nhập"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/idTVModelPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/idTVDateHistory"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_toEndOf="@id/idIVHistory"
+            android:fontFamily="@font/quicksand_medium"
+            android:text="Thông tin máy"
+            android:textColor="@color/black"
+            android:textSize="17sp" />
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

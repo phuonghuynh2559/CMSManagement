@@ -1,5 +1,6 @@
 package com.ChildMonitoringSystem.managerapp.fragment;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DownloadManager;
@@ -15,12 +16,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -36,18 +39,26 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.ChildMonitoringSystem.managerapp.MainActivity;
 import com.ChildMonitoringSystem.managerapp.R;
+import com.ChildMonitoringSystem.managerapp.adapter.InfomationPhoneAdapter;
 import com.ChildMonitoringSystem.managerapp.adapter.VideoAdapter;
 import com.ChildMonitoringSystem.managerapp.api.APIClient;
-import com.ChildMonitoringSystem.managerapp.constan.Constan;
+import com.ChildMonitoringSystem.managerapp.internet_checking.InternetChecking;
+import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
 import com.ChildMonitoringSystem.managerapp.models.Video;
+import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickVideoListener;
+import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.gun0912.tedpermission.PermissionListener;
+import com.gun0912.tedpermission.normal.TedPermission;
 
+import java.io.File;
 import java.util.List;
 
 import retrofit2.Call;
@@ -55,71 +66,104 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class FragmentVideo extends Fragment {
-    private RecyclerView rcvVideo;
+    private RecyclerView rcvVideo, rcv_InfoPhone;
     private View mView;
     private VideoAdapter videoAdapter;
     private VideoView videoView;
-    private ImageButton btnBack;
+    private ImageView btnBack;
     private MainActivity mMainActivity;
-    private TextView idTVOpenFolder;
     private Dialog dialogProcesbar;
     private ImageView idIVNoData;
+    private InfomationPhoneAdapter infomationPhoneAdapter;
+    private MyShareReference myShareReference;
+    private String phoneNumber;
 
-    private String namePhone = "";
     private TextView player_duration;
     private ImageButton idIBBack, idIBPlay, idIBPause, idIForward;
     private ImageView idIBOutDL;
     private SeekBar seeBar;
     private RelativeLayout rlControlsVideo, idRLVideo;
-    private LinearLayout idLLDownloadDL;
+    private LinearLayout idLLDeleteVideo;
     boolean isOpen = true;
     private Handler handler;
     private Runnable runnable;
-    private Dialog dialog, dialogNotify;
-    private View vDialogNotify;
+    private Dialog dialog, dialogNotify, dialogDelteVideoDownl;
+    private String pathVideo;
+
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(DownloadManager.ACTION_DOWNLOAD_COMPLETE)) {
+                CustomProgess.CancleDialog(dialogProcesbar);
+                openVideo(pathVideo);
+            }
+        }
+    };
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialogProcesbar = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_video, container, false);
+        myShareReference = new MyShareReference(getContext());
+        phoneNumber = myShareReference.getValueString("phoneNumber");
         mMainActivity = (MainActivity) getActivity();
         mMainActivity.getToolbar().setTitle("Xem video điện thoại");
 
         rcvVideo = mView.findViewById(R.id.rcv_video_main);
+        rcv_InfoPhone = mView.findViewById(R.id.rcv_InfoPhone);
 
         btnBack = mView.findViewById(R.id.btnBack);
 
         idIVNoData = mView.findViewById(R.id.idIVNoData);
-        //idTVOpenFolder =mView.findViewById(R.id.idTVOpenFolder);
+
+        infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rcv_InfoPhone.setLayoutManager(gridLayoutManager);
+        loadListPhoneMonitor(phoneNumber);
 
         videoAdapter = new VideoAdapter(getContext());
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
-        rcvVideo.setLayoutManager(gridLayoutManager);
+        GridLayoutManager gridLayoutManagerVideo = new GridLayoutManager(getContext(), 1);
+        rcvVideo.setLayoutManager(gridLayoutManagerVideo);
 
-        loadFrameLayout();
         goToFragmentMenu();
         return mView;
     }
 
-    private void openFolderDownload() {
-        idTVOpenFolder.setOnClickListener(new View.OnClickListener() {
+    private void loadListPhoneMonitor(String phoneNumber) {
+        APIClient.getUserService().getListInfoPhone(phoneNumber).enqueue(new Callback<List<InfomationPhone>>() {
             @Override
-            public void onClick(View v) {
-                String path = Environment.getExternalStorageDirectory() + "/Download/";
-                Uri uri = Uri.parse(path);
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setDataAndType(uri, "*/*");
-                startActivity(intent);
+            public void onResponse(Call<List<InfomationPhone>> call, Response<List<InfomationPhone>> response) {
+                if (response.isSuccessful()) {
+                    List<InfomationPhone> mList = response.body();
+                    if (mList.size() == 0) {
+                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
+                            @Override
+                            public void onClickGoToMenu(InfomationPhone phone) {
+                                CustomProgess.OpenDialog(Gravity.CENTER, dialogProcesbar);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getListVideo(phone.getSERI_PHONE());
+                                    }
+                                }, 1000);
+                            }
+
+                        });
+                        rcv_InfoPhone.setAdapter(infomationPhoneAdapter);
+                    }
+                } else {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<InfomationPhone>> call, Throwable t) {
+
             }
         });
-    }
-
-    private void loadFrameLayout() {
-        FragmentInfomationPhone infomationPhone = new FragmentInfomationPhone();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.framelayoutImage, infomationPhone);
-        fragmentTransaction.commit();
     }
 
     private void goToFragmentMenu() {
@@ -132,38 +176,6 @@ public class FragmentVideo extends Fragment {
                 fragmentTransaction.commit();
             }
         });
-    }
-
-    private BroadcastReceiver seriPhone = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Constan.Action.equals(intent.getAction())) {
-                String seri = intent.getStringExtra("seriPhone");
-                namePhone = intent.getStringExtra("namePhone");
-                CustomProgess.OpenDialog(Gravity.CENTER, dialogProcesbar);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getListVideo(seri);
-                    }
-                }, 1000);
-
-            }
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constan.Action);
-        requireActivity().registerReceiver(seriPhone, intentFilter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        requireActivity().unregisterReceiver(seriPhone);
     }
 
     private void getListVideo(String seriPhone) {
@@ -182,13 +194,14 @@ public class FragmentVideo extends Fragment {
                         videoAdapter.setData(vLsit, new IClickVideoListener() {
                             @Override
                             public void onClickItemVideo(Video video) {
-                                if (mMainActivity.checkInternet() == 1) {
-                                    openVideo(video);
-                                }
-                                else if (mMainActivity.checkInternet() == 2) {
-                                    showNotify(Gravity.CENTER,video);
-                                }else {
-                                    Toast.makeText(getContext(),"Bạn không có kết nối mạng!",Toast.LENGTH_SHORT).show();
+                                String url = "http://117.2.159.103:8080/Files/" + video.getSERI_PHONE() + "/Video/" + video.getMEDIA_NAME();
+                                if (InternetChecking.Checknet(getContext()) == 1) {
+                                    CustomProgess.OpenDialog(Gravity.CENTER, dialogProcesbar);
+                                    checkPermison(url);
+                                } else if (InternetChecking.Checknet(getContext()) == 2) {
+                                    showNotify(Gravity.CENTER, url);
+                                } else {
+                                    Toast.makeText(getContext(), "Bạn không có kết nối mạng!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -208,7 +221,7 @@ public class FragmentVideo extends Fragment {
         });
     }
 
-    private void showNotify(int center,Video video) {
+    private void showNotify(int center, String url) {
         dialogNotify = new Dialog(getContext());
         dialogNotify.setContentView(R.layout.layout_dialog_notification);
         Window window = dialogNotify.getWindow();
@@ -227,7 +240,7 @@ public class FragmentVideo extends Fragment {
             @Override
             public void onClick(View view) {
                 dialogNotify.dismiss();
-                openVideo(video);
+                checkPermison(url);
             }
         });
         idBTNotifyNo.setOnClickListener(new View.OnClickListener() {
@@ -239,7 +252,64 @@ public class FragmentVideo extends Fragment {
         dialogNotify.show();
     }
 
-    private void openVideo(Video video) {
+    protected void checkPermison(String url) {
+        PermissionListener permissionlistener = new PermissionListener() {
+            @Override
+            public void onPermissionGranted() {
+                starDowndloadFile(url);
+            }
+
+            @Override
+            public void onPermissionDenied(List<String> deniedPermissions) {
+                Toast.makeText(getContext(), "Permission Denied\n" + deniedPermissions.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+        TedPermission.create()
+                .setPermissionListener(permissionlistener)
+                .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
+                .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .check();
+    }
+
+    private void starDowndloadFile(String url) {
+        String fileName = URLUtil.guessFileName(url, null, null);
+        String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        Log.d("TAG", "onClick: path " + downloadPath);
+        File file = new File(downloadPath, fileName);
+        pathVideo = String.valueOf(file);
+        Log.d("TAG-path", "starDowndloadFile: " + pathVideo);
+        if (file.exists()) {
+            openVideo(pathVideo);
+            Toast.makeText(getContext(), "Video đã được tải về trước đó", Toast.LENGTH_SHORT).show();
+            CustomProgess.CancleDialog(dialogProcesbar);
+        } else {
+            DownloadManager.Request request = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    request = new DownloadManager.Request(Uri.parse(url))
+                            .setTitle(fileName)
+                            .setDescription("Downloading...")
+                            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                            .setDestinationUri(Uri.fromFile(file))
+                            .setRequiresCharging(false)
+                            .setAllowedOverMetered(true)
+                            .setAllowedOverRoaming(true);
+                }
+            } else {
+                request = new DownloadManager.Request(Uri.parse(url))
+                        .setTitle(fileName)
+                        .setDescription("Downloading...")
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                        .setDestinationUri(Uri.fromFile(file))
+                        .setAllowedOverMetered(true)
+                        .setAllowedOverRoaming(true);
+            }
+            DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(getContext().DOWNLOAD_SERVICE);
+            downloadManager.enqueue(request);
+        }
+    }
+
+    private void openVideo(String path) {
         View viewDialog = getLayoutInflater().inflate(R.layout.layout_dialog_video, null);
         dialog = new Dialog(getContext(), android.R.style.Theme_DeviceDefault_Light_NoActionBar_Fullscreen);
         dialog.setContentView(viewDialog);
@@ -259,20 +329,18 @@ public class FragmentVideo extends Fragment {
         seeBar = dialog.findViewById(R.id.seeBar);
         rlControlsVideo = dialog.findViewById(R.id.idControl);
         idRLVideo = dialog.findViewById(R.id.idRLVideo);
-        idLLDownloadDL = dialog.findViewById(R.id.idLLDownloadDL);
+        idLLDeleteVideo = dialog.findViewById(R.id.idLLDeleteVideo);
 
-        String path = "http://117.2.159.103:8080/Files/" + video.getSERI_PHONE() + "/Video/" + video.getMEDIA_NAME();
         idIBOutDL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
             }
         });
-        idLLDownloadDL.setOnClickListener(new View.OnClickListener() {
+        idLLDeleteVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Video đang được tải xuống vui lòng chờ.", Toast.LENGTH_SHORT).show();
-                starDowndloadFile(path);
+                openDialogNotifi(Gravity.CENTER,path);
             }
         });
         videoView.setVideoURI(Uri.parse(path));
@@ -335,6 +403,60 @@ public class FragmentVideo extends Fragment {
         setHandler();
         initializeSeeBar();
         dialog.show();
+    }
+
+    private void openDialogNotifi(int center,String path) {
+        dialogDelteVideoDownl = new Dialog(getContext());
+        dialogDelteVideoDownl.setContentView(R.layout.layout_dialog_notification);
+        Window window = dialogDelteVideoDownl.getWindow();
+        if (window == null) {
+            return;
+        }
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        WindowManager.LayoutParams windowLayoutParams = window.getAttributes();
+        windowLayoutParams.gravity = center;
+        window.setAttributes(windowLayoutParams);
+        dialogDelteVideoDownl.setCancelable(false);
+        Button idBTNotifyOK = dialogDelteVideoDownl.findViewById(R.id.idBTNotifyOK);
+        Button idBTNotifyNo = dialogDelteVideoDownl.findViewById(R.id.idBTNotifyNo);
+
+        TextView idTVContent = dialogDelteVideoDownl.findViewById(R.id.idTVContent);
+        TextView idTVQuestion = dialogDelteVideoDownl.findViewById(R.id.idTVQuestion);
+        idTVContent.setText("Bạn muốn xóa video này ?");
+        idTVQuestion.setVisibility(View.INVISIBLE);
+        idBTNotifyOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                File file = new File(path);
+                deleteDirectory(file);
+                dialogDelteVideoDownl.dismiss();
+                dialog.dismiss();
+            }
+        });
+        idBTNotifyNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogDelteVideoDownl.dismiss();
+            }
+        });
+        dialogDelteVideoDownl.show();
+    }
+
+    public static void deleteDirectory(File file) {
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                File[] files = file.listFiles();
+                for (int i = 0; i < files.length; i++) {
+                    if (files[i].isDirectory()) {
+                        deleteDirectory(files[i]);
+                    } else {
+                        files[i].delete();
+                    }
+                }
+            }
+            file.delete();
+        }
     }
 
     private void hidenControl() {
@@ -447,17 +569,16 @@ public class FragmentVideo extends Fragment {
         });
     }
 
-    private void starDowndloadFile(String path) {
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(path));
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI);
-        request.setTitle("Tải về.");
-        request.setDescription("Đang tải về ...");
-        Toast.makeText(getContext(), "Đang tải về!", Toast.LENGTH_SHORT).show();
-        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, namePhone + "_VideoDownload_" + String.valueOf(System.currentTimeMillis()));
-        DownloadManager downloadManager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-        if (downloadManager != null) {
-            downloadManager.enqueue(request);
-        }
+    @Override
+    public void onStart() {
+        super.onStart();
+        requireActivity()
+                .registerReceiver(broadcastReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        requireActivity().unregisterReceiver(broadcastReceiver);
     }
 }

@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,15 +25,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.ChildMonitoringSystem.managerapp.LoginActivity;
 import com.ChildMonitoringSystem.managerapp.MainActivity;
 import com.ChildMonitoringSystem.managerapp.OTPActivity;
 import com.ChildMonitoringSystem.managerapp.R;
+import com.ChildMonitoringSystem.managerapp.adapter.HistoryAdapter;
 import com.ChildMonitoringSystem.managerapp.api.APIClient;
+import com.ChildMonitoringSystem.managerapp.models.HistorySignin;
 import com.ChildMonitoringSystem.managerapp.models.UserRequest;
+import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -42,31 +50,79 @@ import retrofit2.Response;
 public class FragmentChangePassword extends Fragment {
     private View mView;
     private EditText idETNewPass,idETConfimPass;
-    private Button idBTChangeNewPass;
-    private ImageView idIVBackMenu;
+    private Button idBTChangeNewPass, idBTOpenLayoutChangePass,idBTOpenLayoutHistory;
+    private ImageView idIVBackMenu,idIVNoData;
     private MainActivity mMainActivity;
     private TextView idTVPhoneNumber;
+    private MyShareReference myShareReference;
+    private LinearLayout idLLChangePass, idLLLoginHistory;
+    private RecyclerView idRCVHistory;
     private String phoneNumber;
     private Dialog dialog;
+    private HistoryAdapter historyAdapter;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialog = new Dialog(getContext());
         mView  = inflater.inflate(R.layout.fragment_change_password, container,false);
+        myShareReference = new MyShareReference(getContext());
         mMainActivity = (MainActivity) getActivity();
         mMainActivity.getToolbar().setTitle("Quản lý tài khoản");
+
         idTVPhoneNumber = mView.findViewById(R.id.idTVPhoneNumber);
         idETNewPass = mView.findViewById(R.id.idETNewPass);
         idETConfimPass = mView.findViewById(R.id.idETConfimPass);
         idBTChangeNewPass = mView.findViewById(R.id.idBTChangeNewPass);
         idIVBackMenu = mView.findViewById(R.id.idIVBackMenu);
+        idIVNoData = mView.findViewById(R.id.idIVNoData);
+        idBTOpenLayoutChangePass = mView.findViewById(R.id.idBTOpenLayoutChangePass);
+        idBTOpenLayoutHistory = mView.findViewById(R.id.idBTOpenLayoutHistory);
+        idLLChangePass = mView.findViewById(R.id.idLLChangePass);
+        idLLLoginHistory = mView.findViewById(R.id.idLLLoginHistory);
+        idRCVHistory = mView.findViewById(R.id.idRCVHistory);
 
-        phoneNumber = mMainActivity.getPhoneNumber();
+        phoneNumber = myShareReference.getValueString("phoneNumber");
 
-        idTVPhoneNumber.setText(phoneNumber);
-        changeNewPassWord();
+        historyAdapter = new HistoryAdapter(getContext());
+        GridLayoutManager gridLayoutCall = new GridLayoutManager(getContext(), 1);
+        idRCVHistory.setLayoutManager(gridLayoutCall);
+
+        idLLChangePass.setVisibility(View.INVISIBLE);
+        idLLLoginHistory.setVisibility(View.INVISIBLE);
+        openLayoutChangePass();
+        openLayoutHistory();
         gotoFramentMenu();
         return mView;
+    }
+
+    private void openLayoutChangePass() {
+        idBTOpenLayoutChangePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                idLLChangePass.setVisibility(View.VISIBLE);
+                idLLLoginHistory.setVisibility(View.INVISIBLE);
+                idTVPhoneNumber.setText(phoneNumber);
+                changeNewPassWord();
+            }
+        });
+    }
+
+    private void openLayoutHistory() {
+        idBTOpenLayoutHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CustomProgess.OpenDialog(Gravity.CENTER,dialog);
+                idLLChangePass.setVisibility(View.INVISIBLE);
+                idLLLoginHistory.setVisibility(View.VISIBLE);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getLoginHistory();
+                    }
+                },1500);
+
+            }
+        });
     }
 
     private void gotoFramentMenu() {
@@ -131,5 +187,31 @@ public class FragmentChangePassword extends Fragment {
             return false;
         }
         return true;
+    }
+    public void getLoginHistory(){
+        APIClient.getUserService().getLoginHistory(phoneNumber).enqueue(new Callback<List<HistorySignin>>() {
+            @Override
+            public void onResponse(Call<List<HistorySignin>> call, Response<List<HistorySignin>> response) {
+                if (response.isSuccessful()){
+                    List<HistorySignin> mList = response.body();
+                    if (mList.size()==0){
+                        CustomProgess.CancleDialog(dialog);
+                        idIVNoData.setVisibility(View.VISIBLE);
+                        idRCVHistory.setVisibility(View.INVISIBLE);
+                    }else{
+                        CustomProgess.CancleDialog(dialog);
+                        idIVNoData.setVisibility(View.INVISIBLE);
+                        idRCVHistory.setVisibility(View.VISIBLE);
+                        historyAdapter.setData(mList);
+                        idRCVHistory.setAdapter(historyAdapter);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<HistorySignin>> call, Throwable t) {
+
+            }
+        });
     }
 }

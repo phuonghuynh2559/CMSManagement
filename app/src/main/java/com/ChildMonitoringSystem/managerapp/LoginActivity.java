@@ -3,15 +3,20 @@ package com.ChildMonitoringSystem.managerapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
+import android.app.DownloadManager;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -26,9 +31,17 @@ import com.ChildMonitoringSystem.managerapp.models.HistoryCall;
 import com.ChildMonitoringSystem.managerapp.models.HistorySignin;
 import com.ChildMonitoringSystem.managerapp.models.User;
 import com.ChildMonitoringSystem.managerapp.models.UserRequest;
+import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
 
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -46,13 +59,17 @@ public class LoginActivity extends CustomProgess {
     private TextView tvForgotPassword;
     private Dialog dialog;
 
+    private MyShareReference myShareReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         dialog = new Dialog(this);
+
+        myShareReference = new MyShareReference(getApplicationContext());
+
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_login);
-
         edt_Phone = findViewById(R.id.edit_Phone);
         edt_Pass = findViewById(R.id.edit_Pass);
         idLLRegister = findViewById(R.id.idLLRegister);
@@ -94,6 +111,7 @@ public class LoginActivity extends CustomProgess {
         });
     }
 
+
     private void goToForgotActivity() {
         Intent intent = new Intent(LoginActivity.this, OTPActivity.class);
         startActivity(intent);
@@ -104,6 +122,7 @@ public class LoginActivity extends CustomProgess {
         UserRequest userRequest = new UserRequest();
         userRequest.setPHONE_NUMBERS(edt_Phone.getText().toString());
         userRequest.setPASSWORD_USERS(edt_Pass.getText().toString());
+        String phoneNumber = edt_Phone.getText().toString();
         Call<User> loginRespont = APIClient.getUserService().userLogin(userRequest);
         loginRespont.enqueue(new Callback<User>() {
             @Override
@@ -113,7 +132,9 @@ public class LoginActivity extends CustomProgess {
                     assert user != null;
                     loginHistory(user.getPHONE_NUMBERS());
                     CancleDialog(dialog);
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class).putExtra("data", user));
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+//                    startActivity(new Intent(LoginActivity.this, MainActivity.class).putExtra("data", user));
+                    myShareReference.putValueString("phoneNumber",phoneNumber);
                     finish();
 
                 } else {
@@ -121,6 +142,7 @@ public class LoginActivity extends CustomProgess {
                     Toast.makeText(LoginActivity.this, "Đăng nhập thất bại.", Toast.LENGTH_SHORT).show();
                 }
             }
+
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 Toast.makeText(LoginActivity.this, t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
@@ -128,14 +150,18 @@ public class LoginActivity extends CustomProgess {
             }
         });
     }
+
     public void loginHistory(String phone) {
         String date = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
         String model = Build.MODEL;
-        HistorySignin historySignin = new HistorySignin(phone,date,model);
+        String brand = Build.BRAND;
+        String text ="Thiết bị "+ brand+" "+ model;
+        HistorySignin historySignin = new HistorySignin(phone, date, text);
         APIClient.getUserService().HistorySignIN(historySignin).enqueue(new Callback<HistorySignin>() {
             @Override
             public void onResponse(Call<HistorySignin> call, Response<HistorySignin> response) {
             }
+
             @Override
             public void onFailure(Call<HistorySignin> call, Throwable t) {
             }

@@ -31,16 +31,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.ChildMonitoringSystem.managerapp.MainActivity;
 import com.ChildMonitoringSystem.managerapp.R;
 import com.ChildMonitoringSystem.managerapp.adapter.ImagesAdapter;
+import com.ChildMonitoringSystem.managerapp.adapter.InfomationPhoneAdapter;
 import com.ChildMonitoringSystem.managerapp.api.APIClient;
 import com.ChildMonitoringSystem.managerapp.constan.Constan;
 import com.ChildMonitoringSystem.managerapp.models.Images;
+import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickImageListener;
+import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
 import com.bumptech.glide.Glide;
@@ -53,62 +57,94 @@ import retrofit2.Response;
 
 public class FragmentImages extends Fragment {
     private View mView;
-    private RecyclerView rcvImage;
+    private RecyclerView rcvImage, rcv_InfoPhone;
     private ImagesAdapter imagesAdapter;
-    private TextView idTVOpenFolder;
-    private ImageButton btnBack;
+    private InfomationPhoneAdapter infomationPhoneAdapter;
+    private ImageView btnBack;
     private ImageView imgViewDL;
     private Button idBTGetImage;
-    private String seri;
-    //private LinearLayout linearLayout;
+
     private MainActivity mMainActivity;
     private Dialog dialog;
-    private String namePhone = "";
+
     private ImageView idIVNoData;
     private Dialog dialogProcesbar, dialogNotify;
+
     private int num = 5;
+
+    private MyShareReference myShareReference;
+    private String phoneNumber;
+    private String namePhone;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialogProcesbar = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_image, container, false);
-        rcvImage = mView.findViewById(R.id.rcv_image_main);
+
+        myShareReference = new MyShareReference(getContext());
+        phoneNumber = myShareReference.getValueString("phoneNumber");
         mMainActivity = (MainActivity) getActivity();
         mMainActivity.getToolbar().setTitle("Xem hình ảnh điện thoại");
+
+        rcvImage = mView.findViewById(R.id.rcv_image_main);
+        rcv_InfoPhone = mView.findViewById(R.id.rcv_InfoPhone);
+
         btnBack = mView.findViewById(R.id.btnBack);
         idIVNoData = mView.findViewById(R.id.idIVNoData);
         idBTGetImage = mView.findViewById(R.id.idBTGetImage);
-        //idTVOpenFolder =mView.findViewById(R.id.idTVOpenFolder);
+
+        infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rcv_InfoPhone.setLayoutManager(gridLayoutManager);
+        loadListPhoneMonitor(phoneNumber);
+
         imagesAdapter = new ImagesAdapter(getContext());
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
-        rcvImage.setLayoutManager(gridLayoutManager);
+        GridLayoutManager gridLayoutManagerImage = new GridLayoutManager(getContext(), 3);
+        rcvImage.setLayoutManager(gridLayoutManagerImage);
+
         idBTGetImage.setVisibility(View.INVISIBLE);
-        loadFrameLayout();
         goToFragmentMenu();
 
         return mView;
     }
 
-    private void loadFrameLayout() {
-        FragmentInfomationPhone infomationPhone = new FragmentInfomationPhone();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.framelayoutImage, infomationPhone);
-        fragmentTransaction.commit();
-    }
-
-    private void openFolderDownload() {
-        idTVOpenFolder.setOnClickListener(new View.OnClickListener() {
+    private void loadListPhoneMonitor(String phoneNumber) {
+        APIClient.getUserService().getListInfoPhone(phoneNumber).enqueue(new Callback<List<InfomationPhone>>() {
             @Override
-            public void onClick(View v) {
-                String path = Environment.getExternalStorageDirectory() + "/Download/";
-                Uri uri = Uri.parse(path);
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setDataAndType(uri, "*/*");
-                startActivity(intent);
+            public void onResponse(Call<List<InfomationPhone>> call, Response<List<InfomationPhone>> response) {
+                if (response.isSuccessful()) {
+                    List<InfomationPhone> mList = response.body();
+                    if (mList.size() == 0) {
+                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
+                            @Override
+                            public void onClickGoToMenu(InfomationPhone phone) {
+                                CustomProgess.OpenDialog(Gravity.CENTER, dialogProcesbar);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getImages(phone.getSERI_PHONE(), 5);
+                                    }
+                                }, 1000);
+                                namePhone = phone.getNAME_SPY();
+                                addImage(phone.getSERI_PHONE());
+                            }
+
+                        });
+                        rcv_InfoPhone.setAdapter(infomationPhoneAdapter);
+                    }
+                } else {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<InfomationPhone>> call, Throwable t) {
+
             }
         });
-
     }
 
     private void goToFragmentMenu() {
@@ -123,68 +159,40 @@ public class FragmentImages extends Fragment {
         });
     }
 
-    private BroadcastReceiver seriPhone = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (Constan.Action.equals(intent.getAction())) {
-                seri = intent.getStringExtra("seriPhone");
-                CustomProgess.OpenDialog(Gravity.CENTER, dialogProcesbar);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getImages(seri,5);
-                    }
-                }, 2000);
-                idBTGetImage.setVisibility(View.VISIBLE);
-                addImage(seri);
-            }
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(Constan.Action);
-        requireActivity().registerReceiver(seriPhone, intentFilter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        requireActivity().unregisterReceiver(seriPhone);
-    }
-    private void addImage(String seriPhone){
+    private void addImage(String seriPhone) {
 
         idBTGetImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                num = num+5;
-                CustomProgess.OpenDialog(Gravity.CENTER,dialogProcesbar);
+                num = num + 5;
+                CustomProgess.OpenDialog(Gravity.CENTER, dialogProcesbar);
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        getImages(seriPhone,num);
+                        getImages(seriPhone, num);
                     }
-                },1000);
+                }, 1000);
 
             }
         });
     }
+
     private void getImages(String seriPhone, int num) {
-        APIClient.getUserService().getListImages(seriPhone,num).enqueue(new Callback<List<Images>>() {
+        APIClient.getUserService().getListImages(seriPhone, num).enqueue(new Callback<List<Images>>() {
             @Override
             public void onResponse(Call<List<Images>> call, Response<List<Images>> response) {
-                if (response.isSuccessful()){
-                    List<Images>mList = response.body();
-                    if (mList.size()==0){
+                if (response.isSuccessful()) {
+                    List<Images> mList = response.body();
+                    if (mList.size() == 0) {
                         CustomProgess.CancleDialog(dialogProcesbar);
                         rcvImage.setVisibility(View.INVISIBLE);
                         idIVNoData.setVisibility(View.VISIBLE);
-                    }else{
+                        idBTGetImage.setVisibility(View.INVISIBLE);
+                    } else {
                         CustomProgess.CancleDialog(dialogProcesbar);
                         rcvImage.setVisibility(View.VISIBLE);
                         idIVNoData.setVisibility(View.INVISIBLE);
+                        idBTGetImage.setVisibility(View.VISIBLE);
                         imagesAdapter.setData(mList, new IClickImageListener() {
                             @Override
                             public void onClickItemImage(Images image) {
@@ -288,6 +296,7 @@ public class FragmentImages extends Fragment {
             downloadManager.enqueue(request);
         }
     }
+
     @Override
     public void onPause() {
         super.onPause();

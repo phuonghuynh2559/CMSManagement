@@ -20,6 +20,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,9 +28,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ChildMonitoringSystem.managerapp.MainActivity;
 import com.ChildMonitoringSystem.managerapp.R;
 import com.ChildMonitoringSystem.managerapp.adapter.AppAdapter;
+import com.ChildMonitoringSystem.managerapp.adapter.InfomationPhoneAdapter;
 import com.ChildMonitoringSystem.managerapp.api.APIClient;
 import com.ChildMonitoringSystem.managerapp.constan.Constan;
 import com.ChildMonitoringSystem.managerapp.models.App;
+import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
+import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
+import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
 
 import java.util.List;
@@ -40,105 +45,121 @@ import retrofit2.Response;
 
 public class FragmentApp extends Fragment {
     private View mView;
-    private RecyclerView rcvRecyclerView;
+    private RecyclerView rcv_App, rcv_InfoPhone;
     private AppAdapter appAdapter;
     private ImageView btnBack;
     private MainActivity mMainActivity;
     private ImageView idIVNoData;
     private Dialog dialog;
+    private InfomationPhoneAdapter infomationPhoneAdapter;
+    private MyShareReference myShareReference;
+    private String phoneNumber;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialog = new Dialog(getContext());
-        mView = inflater.inflate(R.layout.fragment_app, container,false);
-        rcvRecyclerView = mView.findViewById(R.id.rcv_app);
-        mMainActivity = (MainActivity)getActivity();
+        mView = inflater.inflate(R.layout.fragment_app, container, false);
+        myShareReference = new MyShareReference(getContext());
+        phoneNumber = myShareReference.getValueString("phoneNumber");
+        mMainActivity = (MainActivity) getActivity();
         mMainActivity.getToolbar().setTitle("Xem ứng dụng được cài đặt");
-        btnBack =mView.findViewById(R.id.btnBack);
-        idIVNoData =mView.findViewById(R.id.idIVNoData);
+
+        rcv_App = mView.findViewById(R.id.rcv_app);
+        rcv_InfoPhone = mView.findViewById(R.id.rcv_InfoPhone);
+        btnBack = mView.findViewById(R.id.btnBack);
+        idIVNoData = mView.findViewById(R.id.idIVNoData);
+
+        infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        rcv_InfoPhone.setLayoutManager(gridLayoutManager);
+        loadListPhoneMonitor(phoneNumber);
+
         appAdapter = new AppAdapter(getContext());
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL,false);
-        rcvRecyclerView.setLayoutManager(linearLayoutManager);
-        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL);
-        rcvRecyclerView.addItemDecoration(itemDecoration);
-        loadFrameLayout();
+        GridLayoutManager gridLayoutCall = new GridLayoutManager(getContext(), 1);
+        rcv_App.setLayoutManager(gridLayoutCall);
+
         goToFragmentMenu();
         return mView;
     }
-    private void loadFrameLayout(){
-        FragmentInfomationPhone infomationPhone = new FragmentInfomationPhone();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.framelayoutApp,infomationPhone);
-        fragmentTransaction.commit();
+
+    private void loadListPhoneMonitor(String phoneNumber) {
+        APIClient.getUserService().getListInfoPhone(phoneNumber).enqueue(new Callback<List<InfomationPhone>>() {
+            @Override
+            public void onResponse(Call<List<InfomationPhone>> call, Response<List<InfomationPhone>> response) {
+                if (response.isSuccessful()) {
+                    List<InfomationPhone> mList = response.body();
+                    if (mList.size() == 0) {
+                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
+                            @Override
+                            public void onClickGoToMenu(InfomationPhone phone) {
+                                CustomProgess.OpenDialog(Gravity.CENTER, dialog);
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getApp(phone.getSERI_PHONE());
+                                    }
+                                }, 1000);
+                            }
+
+                        });
+                        rcv_InfoPhone.setAdapter(infomationPhoneAdapter);
+                    }
+                } else {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<InfomationPhone>> call, Throwable t) {
+
+            }
+        });
     }
+
     private void goToFragmentMenu() {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentMenu fragmentMenu = new FragmentMenu();
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentMenu);
+                fragmentTransaction.replace(R.id.frameLayoutMenu, fragmentMenu);
                 fragmentTransaction.commit();
             }
         });
     }
-    private BroadcastReceiver seriPhone = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(Constan.Action.equals(intent.getAction())){
-                String seri = intent.getStringExtra("seriPhone");
-                CustomProgess.OpenDialog(Gravity.CENTER,dialog);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        getApp(seri);
-                    }
-                },1000);
 
-            }
-        }
-    };
-    @Override
-    public void onStart() {
-        super.onStart();
-        IntentFilter intentFilter = new IntentFilter(Constan.Action);
-        requireActivity().registerReceiver(seriPhone,intentFilter);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        requireActivity().unregisterReceiver(seriPhone);
-    }
     private void getApp(String seri) {
         Call<List<App>> getListApp = APIClient.getUserService().getListApp(seri);
         getListApp.enqueue(new Callback<List<App>>() {
             @Override
             public void onResponse(Call<List<App>> call, Response<List<App>> response) {
-                if (response.isSuccessful()){
-                    List<App>list = response.body();
-                    if (list.size()==0){
+                if (response.isSuccessful()) {
+                    List<App> list = response.body();
+                    if (list.size() == 0) {
                         CustomProgess.CancleDialog(dialog);
                         idIVNoData.setVisibility(View.VISIBLE);
-                        rcvRecyclerView.setVisibility(View.INVISIBLE);
+                        rcv_App.setVisibility(View.INVISIBLE);
                     }
                     CustomProgess.CancleDialog(dialog);
                     appAdapter.setData(list);
-                    rcvRecyclerView.setAdapter(appAdapter);
+                    rcv_App.setAdapter(appAdapter);
                     idIVNoData.setVisibility(View.INVISIBLE);
-                    rcvRecyclerView.setVisibility(View.VISIBLE);
-                }else{
+                    rcv_App.setVisibility(View.VISIBLE);
+                } else {
                     CustomProgess.CancleDialog(dialog);
-                    Toast.makeText(getContext(),"Không có kết nối với máy chủ.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Không có kết nối với máy chủ.", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<App>> call, Throwable t) {
-
             }
         });
     }
+
     @Override
     public void onPause() {
         super.onPause();
