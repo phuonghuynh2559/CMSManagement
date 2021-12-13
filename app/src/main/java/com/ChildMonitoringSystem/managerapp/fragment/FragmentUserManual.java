@@ -1,6 +1,7 @@
 package com.ChildMonitoringSystem.managerapp.fragment;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -101,10 +102,8 @@ public class FragmentUserManual extends Fragment {
         idIVOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentMenu fragmentMenu = new FragmentMenu();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frameLayoutMenu, fragmentMenu);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getContext(),MainActivity.class);
+                startActivity(intent);
             }
         });
     }

@@ -146,10 +146,8 @@ public class FragmentAudio extends Fragment {
         idIBBackMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentMenu fragmentMenu = new FragmentMenu();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentMenu);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getContext(),MainActivity.class);
+                startActivity(intent);
             }
         });
     }

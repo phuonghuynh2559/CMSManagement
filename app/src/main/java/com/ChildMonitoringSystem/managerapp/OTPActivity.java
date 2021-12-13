@@ -68,6 +68,7 @@ public class OTPActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otpactivity);
         mAuth = FirebaseAuth.getInstance();
+
         inputMobile = findViewById(R.id.inputMobile);
         buttonGetOTP = findViewById(R.id.buttonGetOTP);
         progressBar = findViewById(R.id.progressBar);
@@ -91,7 +92,7 @@ public class OTPActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (inputMobile.getText().toString().trim().isEmpty()){
-                    Toast.makeText(OTPActivity.this,"Enter Mobile",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(OTPActivity.this,"Nhập số điện thoại",Toast.LENGTH_SHORT).show();
                 }
                 progressBar.setVisibility(View.VISIBLE);
                 buttonGetOTP.setVisibility(View.GONE);
@@ -107,7 +108,7 @@ public class OTPActivity extends AppCompatActivity {
             }
         });
     }
-    private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+    private final PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         @Override
         public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
             progressBar.setVisibility(View.GONE);
@@ -384,7 +385,6 @@ public class OTPActivity extends AppCompatActivity {
                 PhoneAuthProvider.verifyPhoneNumber(options);
             }
         });
-
     }
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBackAgain = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         @Override

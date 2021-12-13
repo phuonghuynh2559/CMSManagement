@@ -60,7 +60,6 @@ public class LoginActivity extends CustomProgess {
     private Dialog dialog;
 
     private MyShareReference myShareReference;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

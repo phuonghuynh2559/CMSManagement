@@ -143,30 +143,39 @@ public class FragmentChangePassword extends Fragment {
         idBTChangeNewPass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //CustomProgess.OpenDialog(Gravity.CENTER,dialog);
-                String newPass = idETNewPass.getText().toString().trim();
-                if (!checkEdittex()){
-                    CustomProgess.CancleDialog(dialog);
-                }
-                UserRequest userRequest = new UserRequest(phoneNumber,newPass);
-                APIClient.getUserService().changePass(userRequest).enqueue(new Callback<UserRequest>() {
+                CustomProgess.OpenDialog(Gravity.CENTER,dialog);
+                new Handler().postDelayed(new Runnable() {
                     @Override
-                    public void onResponse(Call<UserRequest> call, Response<UserRequest> response) {
-                        if (response.isSuccessful()){
-                            Toast.makeText(getContext(), "Đổi thành công", Toast.LENGTH_SHORT).show();
-                        }else{
-                            Log.d("TAG", "onResponse: "+userRequest.toString());
-                        }
+                    public void run() {
+                        changePass();
                     }
-
-                    @Override
-                    public void onFailure(Call<UserRequest> call, Throwable t) {
-
-                    }
-                });
+                },2000);
             }
         });
 
+    }
+    private void changePass(){
+        String newPass = idETNewPass.getText().toString().trim();
+        if (!checkEdittex()){
+            CustomProgess.CancleDialog(dialog);
+        }
+        UserRequest userRequest = new UserRequest(phoneNumber,newPass);
+        APIClient.getUserService().changePass(userRequest).enqueue(new Callback<UserRequest>() {
+            @Override
+            public void onResponse(Call<UserRequest> call, Response<UserRequest> response) {
+                if (response.isSuccessful()){
+                    CustomProgess.CancleDialog(dialog);
+                    Toast.makeText(getContext(), "Đổi thành công", Toast.LENGTH_SHORT).show();
+                }else{
+                    Log.d("TAG", "onResponse: "+userRequest.toString());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserRequest> call, Throwable t) {
+
+            }
+        });
     }
     private Boolean checkEdittex(){
         String newPass = idETNewPass.getText().toString().trim();

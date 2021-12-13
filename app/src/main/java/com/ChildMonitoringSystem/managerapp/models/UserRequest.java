@@ -27,4 +27,5 @@ public class UserRequest {
     public void setPASSWORD_USERS(String PASSWORD_USERS) {
         this.PASSWORD_USERS = PASSWORD_USERS;
     }
+
 }

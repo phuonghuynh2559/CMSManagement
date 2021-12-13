@@ -84,13 +84,7 @@ public class FragmentContact extends Fragment {
         rcv_contact.setLayoutManager(linearLayoutManager);
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
         rcv_contact.addItemDecoration(itemDecoration);
-        //loadFrameLayout();
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                backFragmentBefore();
-            }
-        });
+        backFragmentBefore();
         return view;
     }
 
@@ -128,43 +122,6 @@ public class FragmentContact extends Fragment {
             }
         });
     }
-//
-//    private void loadFrameLayout() {
-//        FragmentInfomationPhone infomationPhone = new FragmentInfomationPhone();
-//        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-//        fragmentTransaction.replace(R.id.framelayoutContact, infomationPhone);
-//        fragmentTransaction.commit();
-//    }
-
-//    private BroadcastReceiver seriPhone = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            if (Constan.Action.equals(intent.getAction())) {
-//                String seri = intent.getStringExtra("seriPhone");
-//                CustomProgess.OpenDialog(Gravity.CENTER,dialog);
-//                new Handler().postDelayed(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        getContactPhone(seri);
-//                    }
-//                },1000);
-//
-//            }
-//        }
-//    };
-//
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        IntentFilter intentFilter = new IntentFilter(Constan.Action);
-//        requireActivity().registerReceiver(seriPhone, intentFilter);
-//    }
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        requireActivity().unregisterReceiver(seriPhone);
-//    }
-
     private void getContactPhone(String seriPhone) {
         Call<List<Contact>> getListContact = APIClient.getUserService().getListContact(seriPhone);
         getListContact.enqueue(new Callback<List<Contact>>() {
@@ -196,10 +153,13 @@ public class FragmentContact extends Fragment {
     }
 
     public void backFragmentBefore() {
-        FragmentMenu fragmentMenu = new FragmentMenu();
-        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayoutMenu, fragmentMenu);
-        fragmentTransaction.commit();
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(),MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

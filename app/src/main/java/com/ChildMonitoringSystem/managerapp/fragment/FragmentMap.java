@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
@@ -240,10 +241,8 @@ public class FragmentMap extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentMenu fragmentMenu = new FragmentMenu();
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentMenu);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getContext(),MainActivity.class);
+                startActivity(intent);
             }
         });
     }
