@@ -2,8 +2,8 @@ package com.ChildMonitoringSystem.managerapp.models;
 
 public class LocationOffline {
     private String DATE_LOG;
-    private String LATITUDE;
     private String LONGTITUDE;
+    private String LATITUDE;
     private String SERI_PHONE;
     public LocationOffline() {
     }

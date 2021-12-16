@@ -17,7 +17,9 @@ import com.ChildMonitoringSystem.managerapp.models.Video;
 
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -74,6 +76,14 @@ public interface UserService
     @GET("Home/api/getHL")
     Call<List<HistorySignin>>getLoginHistory(@Query("num") String phoneNumber);
     //Get location
-    @GET("Home/api/GetLocation")
+    @GET("Home/api/getLocation")
     Call<List<LocationOffline>>getLocation(@Query("seri")String seriPhone);
+    //Delete location
+    @POST("api/deletePLocation")
+    Call<ResponseBody>deleteLocation(@Query("seri")String seriPhone);
+    //Filter location
+    @GET("Home/api/GetFromDate?seri={seri}&start={start}&end={end}")
+    Call<List<LocationOffline>>getLocationFilter(@Query("seri") String seriPhone,
+                                                 @Query("start") String start,
+                                                 @Query("end")String end);
 }

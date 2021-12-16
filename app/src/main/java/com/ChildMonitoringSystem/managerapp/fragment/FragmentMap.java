@@ -18,7 +18,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.ChildMonitoringSystem.managerapp.MainActivity;
@@ -48,6 +53,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,6 +65,11 @@ public class FragmentMap extends Fragment {
     private Marker myMarke;
     private ImageView btnBack;
     private MainActivity mMainActivity;
+    private RadioButton radioButton_online, radioButton_offline;
+    private LinearLayout idLLOptionOffline;
+    private String seriPhone;
+    private Button idBTNDeleteLocation,idBTNFilter;
+    private RadioGroup radioGroup_Location;
 
     private RecyclerView rcv_InfoPhone;
     private InfomationPhoneAdapter infomationPhoneAdapter;
@@ -68,10 +79,10 @@ public class FragmentMap extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             mMap = googleMap;
-            LatLng sydney = new LatLng(10.1020835,106.671841);
+            LatLng sydney = new LatLng(10.1020835, 106.671841);
             mMap.clear();
             myMarke = mMap.addMarker(new MarkerOptions().position(sydney).title(""));
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney,18),5000,null);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(sydney, 18), 5000, null);
         }
     };
 
@@ -84,11 +95,17 @@ public class FragmentMap extends Fragment {
         myShareReference = new MyShareReference(getContext());
         phoneNumber = myShareReference.getValueString("phoneNumber");
 
-        mMainActivity = (MainActivity)getActivity();
+        mMainActivity = (MainActivity) getActivity();
         mMainActivity.getToolbar().setTitle("Xem vị trí điện thoại");
 
-        btnBack =mView.findViewById(R.id.btnBack);
-        rcv_InfoPhone =mView.findViewById(R.id.rcv_InfoPhone);
+        btnBack = mView.findViewById(R.id.btnBack);
+        rcv_InfoPhone = mView.findViewById(R.id.rcv_InfoPhone);
+        radioButton_online = mView.findViewById(R.id.radioButton_online);
+        radioButton_offline = mView.findViewById(R.id.radioButton_offline);
+        idLLOptionOffline = mView.findViewById(R.id.idLLOptionOffline);
+        idBTNDeleteLocation = mView.findViewById(R.id.idBTNDeleteLocation);
+        idBTNFilter = mView.findViewById(R.id.idBTNFilter);
+        radioGroup_Location = mView.findViewById(R.id.radioGroup_Location);
 
         infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
@@ -98,16 +115,19 @@ public class FragmentMap extends Fragment {
         return mView;
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         goToFragmentMenu();
         loadListPhoneMonitor(phoneNumber);
+        radioGroup_Location.setVisibility(View.GONE);
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
+
     }
 
     private void loadListPhoneMonitor(String phoneNumber) {
@@ -125,7 +145,11 @@ public class FragmentMap extends Fragment {
                                 new Handler().postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
-                                        drawLocation(phone.getSERI_PHONE());
+                                       seriPhone = phone.getSERI_PHONE();
+                                        radioGroup_Location.setVisibility(View.VISIBLE);
+                                        radioButton_online.setChecked(true);
+                                        readLocationRealTime(seriPhone);
+                                        evenClickListener(seriPhone);
                                     }
                                 }, 1000);
                             }
@@ -143,35 +167,70 @@ public class FragmentMap extends Fragment {
             }
         });
     }
-    private void drawLocation(String seriPhone){
-        readLocationRealTime(seriPhone);
-        readLocationOffLine(seriPhone);
+    private void evenClickListener(String seriphone) {
+        radioButton_online.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                idLLOptionOffline.setVisibility(View.GONE);
+                readLocationRealTime(seriphone);
+            }
+        });
+        radioButton_offline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                idLLOptionOffline.setVisibility(View.VISIBLE);
+                readLocationOffLine(seriphone);
+                idBTNDeleteLocation.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        APIClient.getUserService().deleteLocation(seriphone).enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                mMap.clear();
+                                Toast.makeText(getContext(),"Xóa thành công",Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
+                    }
+                });
+                idBTNFilter.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+            }
+        });
     }
 
     private void readLocationRealTime(String seriPhone) {
-        reference = FirebaseDatabase.getInstance().getReference().child("/"+seriPhone);
+        reference = FirebaseDatabase.getInstance().getReference().child("/" + seriPhone);
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     try {
                         LocationRealTime location = snapshot.getValue(LocationRealTime.class);
-                        if (location != null){
-                            String nameLocation="";
-                            myMarke.setPosition(new LatLng(Double.parseDouble(location.getLatitude()),Double.parseDouble(location.getLongtitude())));
+                        if (location != null) {
+                            String nameLocation = "";
+                            myMarke.setPosition(new LatLng(Double.parseDouble(location.getLatitude()), Double.parseDouble(location.getLongtitude())));
                             Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
                             List<Address> addresses;
                             try {
-                                addresses = geocoder.getFromLocation(Double.parseDouble(location.getLatitude()),Double.parseDouble(location.getLongtitude()),10);
-                                if (addresses.size() >0){
-                                    for (Address adr: addresses){
-                                        if (adr.getAddressLine(0) !=null && adr.getAddressLine(0).length() >0){
+                                addresses = geocoder.getFromLocation(Double.parseDouble(location.getLatitude()), Double.parseDouble(location.getLongtitude()), 10);
+                                if (addresses.size() > 0) {
+                                    for (Address adr : addresses) {
+                                        if (adr.getAddressLine(0) != null && adr.getAddressLine(0).length() > 0) {
                                             nameLocation = adr.getAddressLine(0);
                                             break;
                                         }
                                     }
                                 }
-                            }catch (IOException e){
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             //xóa vị trí củ
@@ -179,53 +238,55 @@ public class FragmentMap extends Fragment {
                             mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
                                     .title(nameLocation)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 18),5000,null);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 18), 5000, null);
 
                         }
-                    }catch (Exception e){
-                        Log.d("TAG", "onDataChange: "+e);
-                        Toast.makeText(getContext(),"Điện thoại này không có đồng bộ vị trí.",Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) {
+                        Log.d("TAG", "onDataChange: " + e);
+                        Toast.makeText(getContext(), "Điện thoại này không có đồng bộ vị trí.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("TAG", "onCancelled: "+error);
-                Toast.makeText(getContext(),"Điện thoại này không có đồng bộ vị trí.",Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "onCancelled: " + error);
+                Toast.makeText(getContext(), "Điện thoại này không có đồng bộ vị trí.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void readLocationOffLine(String seriPhone) {
+        mMap.clear();
         APIClient.getUserService().getLocation(seriPhone).enqueue(new Callback<List<LocationOffline>>() {
             @Override
             public void onResponse(Call<List<LocationOffline>> call, Response<List<LocationOffline>> response) {
-                if (response.isSuccessful()){
-                    List<LocationOffline>mList = response.body();
-                    if (mList.size()==0){
-                    }else{
-                        for (int i = 0 ; i< mList.size();i++){
-                            String nameLocation="";
-                            myMarke.setPosition(new LatLng(Double.parseDouble(mList.get(i).getLATITUDE()),Double.parseDouble(mList.get(i).getLONGTITUDE())));
+                if (response.isSuccessful()) {
+                    List<LocationOffline> mList = response.body();
+                    if (mList.size() == 0) {
+                    } else {
+                        for (int i = 0; i < mList.size(); i++) {
+                            String nameLocation = "";
+                            myMarke.setPosition(new LatLng(Double.parseDouble(mList.get(i).getLATITUDE()), Double.parseDouble(mList.get(i).getLONGTITUDE())));
                             Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
                             List<Address> addresses;
                             try {
-                                addresses = geocoder.getFromLocation(Double.parseDouble(mList.get(i).getLATITUDE()),Double.parseDouble(mList.get(i).getLONGTITUDE()),10);
-                                if (addresses.size() >0){
-                                    for (Address adr: addresses){
-                                        if (adr.getAddressLine(0) !=null && adr.getAddressLine(0).length() >0){
-                                            String type = " Vị trí đã từng đi qua: ";
-                                            nameLocation = adr.getAddressLine(0)+type + mList.get(i).getDATE_LOG();
+                                addresses = geocoder.getFromLocation(Double.parseDouble(mList.get(i).getLATITUDE()), Double.parseDouble(mList.get(i).getLONGTITUDE()), 10);
+                                if (addresses.size() > 0) {
+                                    for (Address adr : addresses) {
+                                        if (adr.getAddressLine(0) != null && adr.getAddressLine(0).length() > 0) {
+                                            //String type = " Vị trí đã từng đi qua: ";
+                                            nameLocation = adr.getAddressLine(0);
                                             break;
                                         }
                                     }
                                 }
-                            }catch (IOException e){
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                             mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()).title(nameLocation));
                         }
-                        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 18),5000,null);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 18),5000,null);
                     }
                 }
             }
@@ -241,7 +302,7 @@ public class FragmentMap extends Fragment {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getContext(),MainActivity.class);
+                Intent intent = new Intent(getContext(), MainActivity.class);
                 startActivity(intent);
             }
         });
