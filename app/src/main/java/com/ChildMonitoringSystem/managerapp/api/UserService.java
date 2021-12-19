@@ -81,8 +81,12 @@ public interface UserService
     //Delete location
     @POST("api/deletePLocation")
     Call<ResponseBody>deleteLocation(@Query("seri")String seriPhone);
+    //Filter loction one day
+    @GET("Home/api/GetInDate")
+    Call<List<LocationOffline>>getLocationOneDay(@Query("seri")String seriPhone,
+                                                 @Query("a") String date);
     //Filter location
-    @GET("Home/api/GetFromDate?seri={seri}&start={start}&end={end}")
+    @GET("Home/api/GetFromDate")
     Call<List<LocationOffline>>getLocationFilter(@Query("seri") String seriPhone,
                                                  @Query("start") String start,
                                                  @Query("end")String end);

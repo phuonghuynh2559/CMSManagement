@@ -49,7 +49,7 @@
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_image.xml" value="0.25" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_inbox.xml" value="0.21822916666666667" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_infomation_phone.xml" value="0.21822916666666667" />
-        <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_map.xml" value="0.33" />
+        <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_map.xml" value="0.25" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_menu.xml" value="0.33" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_monitor_manage.xml" value="0.33" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/fragment_user_manual.xml" value="0.33" />
@@ -74,6 +74,7 @@
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_dialog_show_mess.xml" value="0.21822916666666667" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_dialog_video.xml" value="0.25" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_dialog_virify_code.xml" value="0.21822916666666667" />
+        <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_filter_map.xml" value="0.33" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_support_app.xml" value="0.21822916666666667" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_support_audio.xml" value="0.21822916666666667" />
         <entry key="..\:/Android/MyApplication/app/src/main/res/layout/layout_support_call_log.xml" value="0.25" />

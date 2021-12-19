@@ -7,71 +7,162 @@
     android:orientation="vertical"
     android:padding="10dp"
     tools:context=".fragment.FragmentMap">
-<LinearLayout
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:background="@color/colorMenuBackground"
-        android:src="@drawable/ic_baseline_arrow_back_24" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:id="@+id/rcv_InfoPhone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-</LinearLayout>
-
-    <RadioGroup
-        android:id="@+id/radioGroup_Location"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginEnd="16dp">
-
-        <RadioButton
-            android:layout_marginLeft="30dp"
-            android:id="@+id/radioButton_online"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="GPS Online" />
-
-        <RadioButton
-            android:layout_marginLeft="30dp"
-            android:layout_weight="1"
-            android:id="@+id/radioButton_offline"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="GPS Offline" />
-    </RadioGroup>
     <LinearLayout
-        android:id="@+id/idLLOptionOffline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:background="@color/colorMenuBackground"
+            android:src="@drawable/ic_baseline_arrow_back_24" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcv_InfoPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/idLL1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioGroup
+            android:id="@+id/radioGroup_Location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/radioButton_online"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GPS Online" />
+
+            <RadioButton
+                android:id="@+id/radioButton_offline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GPS Offline" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/idLLOptionOffline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical"
+            android:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/idBTNDeleteLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_delete_24"
+                android:text="Xóa vị trí"
+                android:textAllCaps="false" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/idBTNFilter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_filter"
+                android:text="Lọc vị trí"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/radioGroup_Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/radioButton_InDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/quicksand_medium"
+                android:text="Lọc theo ngày" />
+
+            <RadioButton
+                android:id="@+id/radioButton_FromDay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/quicksand_medium"
+                android:text="Lọc từ ngày" />
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/idLLFiter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/idEDInDay"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/quicksand_medium"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/idTVUndercore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="50dp" />
+
+        <EditText
+            android:id="@+id/idEDFromDay"
+            android:layout_width="0dp"
+            android:layout_height="45dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/quicksand_medium"
+            android:gravity="center"
+            android:importantForAutofill="no"
+            android:textColor="@color/colorTextPrimary"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/idBTSetFilter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Lọc dữ liệu"
+            android:visibility="visible" />
+    </LinearLayout>
+    <LinearLayout
         android:visibility="gone"
-        android:layout_gravity="end"
-        android:layout_marginRight="20dp"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/idBTNDeleteLocation"
-            android:drawableStart="@drawable/ic_delete_24"
-            android:text="Xóa vị trí offline"
-            android:textAllCaps="false"
+
+        <TextView
+            android:id="@+id/dateApi1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/idBTNFilter"
-            android:drawableStart="@drawable/ic_filter"
-            android:text="Lọc vị trí offline"
-            android:textAllCaps="false"
+            android:layout_height="wrap_content"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/dateApi2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:visibility="invisible" />
     </LinearLayout>
     <fragment
         android:id="@+id/map"
