@@ -2,6 +2,7 @@ package com.ChildMonitoringSystem.managerapp.fragment;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.ChildMonitoringSystem.managerapp.MainActivity;
 import com.ChildMonitoringSystem.managerapp.R;
@@ -24,6 +26,7 @@ public class FragmentUserManual extends Fragment {
     private RelativeLayout idRLContact, idRLAudio, idRLApp, idRLLocation, idRLVideo, idRLImage, idRLMessage, idRLCallLog;
     private Dialog dlContact,dlCallLog, dlMEss, dlImage, dlViddeo, dlLocation,dlApp, dlAudio;
     private ImageView idIVOut;
+    private TextView idTVGotoWebDownload;
     private MainActivity mMainActivity;
     public FragmentUserManual() {
     }
@@ -45,6 +48,8 @@ public class FragmentUserManual extends Fragment {
         idRLLocation = mView.findViewById(R.id.idRLLocation);
         idRLApp = mView.findViewById(R.id.idRLApp);
         idRLAudio = mView.findViewById(R.id.idRLAudio);
+
+        idTVGotoWebDownload = mView.findViewById(R.id.idTVGotoWebDownload);
 
         idIVOut = mView.findViewById(R.id.idIVOut);
         evvenListener();
@@ -104,6 +109,12 @@ public class FragmentUserManual extends Fragment {
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(),MainActivity.class);
                 startActivity(intent);
+            }
+        });
+        idTVGotoWebDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openWebDownload();
             }
         });
     }
@@ -246,5 +257,11 @@ public class FragmentUserManual extends Fragment {
         });
 
         dlAudio.show();
+    }
+    private void openWebDownload(){
+        String  url = "http://117.2.159.103:8080/Download/Index";
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 }
