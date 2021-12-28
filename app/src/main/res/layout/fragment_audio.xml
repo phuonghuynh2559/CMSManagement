@@ -41,9 +41,10 @@
 
         <ImageView
             android:id="@+id/idIVNoData"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/nodata"
+            android:scaleType="centerCrop"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/lg_no_data"
             android:visibility="invisible" />
     </RelativeLayout>
 

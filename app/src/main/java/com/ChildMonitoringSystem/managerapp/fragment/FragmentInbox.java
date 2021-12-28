@@ -57,7 +57,7 @@ public class FragmentInbox extends Fragment {
     private InboxAdapter inboxAdapter;
     private InfomationPhoneAdapter infomationPhoneAdapter;
     private ContentMessAdapter contentMessAdapter;
-    private ImageButton btnBack;
+    private ImageView btnBack;
     private MainActivity mMainActivity;
     private TextView idTVPhoneNumberInbox, idTVNameInbox;
     private ImageView idIVBackLogin;

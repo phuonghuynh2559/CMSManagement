@@ -87,13 +87,13 @@ private MainActivity mMainActivity;
     private void clickGotoFragmentContat() {
         FragmentContact fragmentContact = new FragmentContact();
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentContact);
+        fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentContact).addToBackStack(null);
         fragmentTransaction.commit();
     }
     public void clickGotoFragmentHistoryCall(){
         FragmentCallLog fragmentCallLog = new FragmentCallLog();
         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentCallLog);
+        fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentCallLog).addToBackStack(null);
         fragmentTransaction.commit();
     }
     private void clickGotoFragmentInbox() {
