@@ -71,7 +71,7 @@ public interface UserService
     @GET("Home/api/GetVideos")
     Call<List<Video>>getListVideo(@Query("seri") String seriPhone);
     @GET("Home/api/getinformation")
-    Call<InfomationPhone>getInfo(@Query("seri") String seriPhone);
+    Call<InfomationPhone>getInfomationPhone(@Query("seri") String seriPhone);
     // History login
     @GET("Home/api/getHL")
     Call<List<HistorySignin>>getLoginHistory(@Query("num") String phoneNumber);

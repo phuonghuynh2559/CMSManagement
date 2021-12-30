@@ -1,22 +1,26 @@
 package com.ChildMonitoringSystem.managerapp.models;
 
 public class Audio {
-    private String IMAGES_NAME;
+    private String MEDIA_NAME;
     private String SERI_PHONE;
-    private String DATE_IMAGE;
+    private String DATE_MEDIA;
+    private String SIZE;
+    private String DURATION;
 
-    public Audio(String IMAGES_NAME, String SERI_PHONE, String DATE_IMAGE) {
-        this.IMAGES_NAME = IMAGES_NAME;
+    public Audio(String MEDIA_NAME, String SERI_PHONE, String DATE_MEDIA, String SIZE, String DURATION) {
+        this.MEDIA_NAME = MEDIA_NAME;
         this.SERI_PHONE = SERI_PHONE;
-        this.DATE_IMAGE = DATE_IMAGE;
+        this.DATE_MEDIA = DATE_MEDIA;
+        this.SIZE = SIZE;
+        this.DURATION = DURATION;
     }
 
-    public String getIMAGES_NAME() {
-        return IMAGES_NAME;
+    public String getMEDIA_NAME() {
+        return MEDIA_NAME;
     }
 
-    public void setIMAGES_NAME(String IMAGES_NAME) {
-        this.IMAGES_NAME = IMAGES_NAME;
+    public void setMEDIA_NAME(String MEDIA_NAME) {
+        this.MEDIA_NAME = MEDIA_NAME;
     }
 
     public String getSERI_PHONE() {
@@ -27,11 +31,27 @@ public class Audio {
         this.SERI_PHONE = SERI_PHONE;
     }
 
-    public String getDATE_IMAGE() {
-        return DATE_IMAGE;
+    public String getDATE_MEDIA() {
+        return DATE_MEDIA;
     }
 
-    public void setDATE_IMAGE(String DATE_IMAGE) {
-        this.DATE_IMAGE = DATE_IMAGE;
+    public void setDATE_MEDIA(String DATE_MEDIA) {
+        this.DATE_MEDIA = DATE_MEDIA;
+    }
+
+    public String getSIZE() {
+        return SIZE;
+    }
+
+    public void setSIZE(String SIZE) {
+        this.SIZE = SIZE;
+    }
+
+    public String getDURATION() {
+        return DURATION;
+    }
+
+    public void setDURATION(String DURATION) {
+        this.DURATION = DURATION;
     }
 }

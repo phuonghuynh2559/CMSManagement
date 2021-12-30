@@ -14,6 +14,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -143,6 +145,8 @@ public class FragmentMap extends Fragment {
         dateApi1 = mView.findViewById(R.id.dateApi1);
         dateApi2 = mView.findViewById(R.id.dateApi2);
 
+        idEDInDay.setInputType(InputType.TYPE_NULL);
+        idEDFromDay.setInputType(InputType.TYPE_NULL);
         infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
         gridLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);

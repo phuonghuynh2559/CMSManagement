@@ -42,7 +42,8 @@ public class AudioAdapter extends  RecyclerView.Adapter<AudioAdapter.AudioViewHo
     public void onBindViewHolder(@NonNull AudioViewHoder holder, int position) {
         final Audio audio = mList.get(position);
         if (audio==null)return ;
-        holder.tvAudioDayIT.setText(audio.getDATE_IMAGE());
+        holder.tvNameMedia.setText(audio.getMEDIA_NAME());
+        holder.tvAudioDayIT.setText(audio.getDATE_MEDIA());
         holder.cvAudioIT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,11 +62,12 @@ public class AudioAdapter extends  RecyclerView.Adapter<AudioAdapter.AudioViewHo
 
     public class AudioViewHoder extends RecyclerView.ViewHolder{
         private CardView cvAudioIT;
-        private TextView tvAudioDayIT;
+        private TextView tvAudioDayIT,tvNameMedia;
         public AudioViewHoder(@NonNull View itemView) {
             super(itemView);
             cvAudioIT = itemView.findViewById(R.id.cvAudioIT);
             tvAudioDayIT = itemView.findViewById(R.id.tvAudioDayIT);
+            tvNameMedia = itemView.findViewById(R.id.tvNameMedia);
         }
     }
 }

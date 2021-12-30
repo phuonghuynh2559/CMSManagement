@@ -32,6 +32,7 @@ import com.ChildMonitoringSystem.managerapp.fragment.FragmentImages;
 import com.ChildMonitoringSystem.managerapp.fragment.FragmentInbox;
 import com.ChildMonitoringSystem.managerapp.fragment.FragmentMap;
 import com.ChildMonitoringSystem.managerapp.fragment.FragmentMenu;
+import com.ChildMonitoringSystem.managerapp.fragment.FragmentMonitorManage;
 import com.ChildMonitoringSystem.managerapp.fragment.FragmentUserManual;
 import com.ChildMonitoringSystem.managerapp.fragment.FragmentVideo;
 import com.ChildMonitoringSystem.managerapp.models.User;
@@ -195,11 +196,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fragment = new FragmentChangePassword();
         }
         if (id == R.id.nav_monitor) {
-            Toast.makeText(MainActivity.this, "Chức Năng Đang Được Phát Triển !", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "Chức Năng Đang Được Phát Triển !", Toast.LENGTH_SHORT).show();
 //            FragmentMonitorManage fragmentMonitorManage = new FragmentMonitorManage();
 //            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 //            fragmentTransaction.replace(R.id.frameLayoutMenu,fragmentMonitorManage);
 //            fragmentTransaction.commit();
+            fragment = new FragmentMonitorManage();
         }
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();

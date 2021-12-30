@@ -163,10 +163,11 @@ public class FragmentAudio extends Fragment {
                         idIVNoData.setVisibility(View.VISIBLE);
                         rcvAudio.setVisibility(View.INVISIBLE);
                     }else{
-                        CustomProgess.CancleDialog(dialog);
+                        CustomProgess.CancleDialog(dialogProcessbar);
                         audioAdapter.setData(audioList, new IClickAudioListener() {
                             @Override
                             public void onClickAudio(Audio audio) {
+
                                 openDetailAudio(audio);
                             }
                         });
@@ -210,9 +211,9 @@ public class FragmentAudio extends Fragment {
                 dialog.dismiss();
             }
         });
-        idTVNameAudio.setText(audio.getIMAGES_NAME());
+        idTVNameAudio.setText(audio.getMEDIA_NAME());
         String audioURL = "http://117.2.159.103:8080/Files/"
-                +audio.getSERI_PHONE()+"/Audio/"+audio.getIMAGES_NAME();
+                +audio.getSERI_PHONE()+"/Audio/"+audio.getMEDIA_NAME();
         mediaPlayer = MediaPlayer.create(getContext(), Uri.parse(audioURL));
         runnable = new Runnable() {
             @Override
