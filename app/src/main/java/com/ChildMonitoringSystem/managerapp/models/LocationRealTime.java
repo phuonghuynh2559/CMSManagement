@@ -1,17 +1,27 @@
 package com.ChildMonitoringSystem.managerapp.models;
 
 public class LocationRealTime {
+    private String dateLog;
     private String latitude;
     private String longtitude;
-    private String seri;
+    private String seriphone;
 
-    public LocationRealTime(String latitude, String longtitude, String seri) {
+    public LocationRealTime(String dateLog, String latitude, String longtitude, String seriphone) {
+        this.dateLog = dateLog;
         this.latitude = latitude;
         this.longtitude = longtitude;
-        this.seri = seri;
+        this.seriphone = seriphone;
     }
 
     public LocationRealTime() {
+    }
+
+    public String getDateLog() {
+        return dateLog;
+    }
+
+    public void setDateLog(String dateLog) {
+        this.dateLog = dateLog;
     }
 
     public String getLatitude() {
@@ -31,10 +41,10 @@ public class LocationRealTime {
     }
 
     public String getSeri() {
-        return seri;
+        return seriphone;
     }
 
     public void setSeri(String seri) {
-        this.seri = seri;
+        this.seriphone = seri;
     }
 }

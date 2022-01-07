@@ -182,4 +182,9 @@ public class LoginActivity extends CustomProgess {
             CancleDialog(dialog);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

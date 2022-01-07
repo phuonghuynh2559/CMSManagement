@@ -42,6 +42,7 @@ import com.ChildMonitoringSystem.managerapp.models.LocationOffline;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.ChildMonitoringSystem.managerapp.ui.NotifyProgess;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -66,7 +67,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragmentMap extends Fragment {
+public class FragmentMap extends NotifyProgess {
     private GoogleMap mMap;
     private DatabaseReference reference;
     private LocationManager manager;
@@ -79,14 +80,13 @@ public class FragmentMap extends Fragment {
     private Button idBTNDeleteLocation, idBTNFilter, idBTSetFilter;
     private RadioGroup radioGroup_Location, radioGroup_Filter;
     private EditText idEDInDay, idEDFromDay;
-    private TextView idTVUndercore, dateApi1, dateApi2;
+    private TextView idTVUndercore, dateApi1, dateApi2, idTVDateLocation;
 
-    private List<LocationOffline> mList;
     private RecyclerView rcv_InfoPhone;
     private InfomationPhoneAdapter infomationPhoneAdapter;
     private MyShareReference myShareReference;
     private String phoneNumber;
-    private Dialog dialog;
+    private Dialog dialog, dialogDownloadTool;
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
@@ -105,6 +105,7 @@ public class FragmentMap extends Fragment {
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         dialog = new Dialog(getContext());
+        dialogDownloadTool = new Dialog(getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         View mView = inflater.inflate(R.layout.fragment_map, container, false);
@@ -145,6 +146,8 @@ public class FragmentMap extends Fragment {
         dateApi1 = mView.findViewById(R.id.dateApi1);
         dateApi2 = mView.findViewById(R.id.dateApi2);
 
+        idTVDateLocation = mView.findViewById(R.id.idTVDateLocation);
+
         idEDInDay.setInputType(InputType.TYPE_NULL);
         idEDFromDay.setInputType(InputType.TYPE_NULL);
         infomationPhoneAdapter = new InfomationPhoneAdapter(getContext());
@@ -154,7 +157,6 @@ public class FragmentMap extends Fragment {
 
         return mView;
     }
-
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -178,7 +180,7 @@ public class FragmentMap extends Fragment {
                 if (response.isSuccessful()) {
                     List<InfomationPhone> mList = response.body();
                     if (mList.size() == 0) {
-                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                        OpenDialogNotify(Gravity.CENTER,dialogDownloadTool);
                     } else {
                         infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
                             @Override
@@ -218,6 +220,7 @@ public class FragmentMap extends Fragment {
                 radioGroup_Filter.setVisibility(View.INVISIBLE);
                 idLLFiter.setVisibility(View.GONE);
                 readLocationRealTime(seriphone);
+                idTVDateLocation.setVisibility(View.INVISIBLE);
             }
         });
         radioButton_offline.setOnClickListener(new View.OnClickListener() {
@@ -226,9 +229,11 @@ public class FragmentMap extends Fragment {
                 CustomProgess.OpenDialog(Gravity.CENTER, dialog);
                 idLLOptionOffline.setVisibility(View.VISIBLE);
                 readLocationOffLine(seriphone);
+                idTVDateLocation.setVisibility(View.INVISIBLE);
                 idBTNDeleteLocation.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        idTVDateLocation.setVisibility(View.INVISIBLE);
                         radioGroup_Filter.setVisibility(View.INVISIBLE);
                         idLLFiter.setVisibility(View.GONE);
 
@@ -249,6 +254,7 @@ public class FragmentMap extends Fragment {
                 idBTNFilter.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        idTVDateLocation.setVisibility(View.INVISIBLE);
                         radioGroup_Filter.setVisibility(View.VISIBLE);
                         radioButton_InDay.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -282,7 +288,13 @@ public class FragmentMap extends Fragment {
                                     @Override
                                     public void onClick(View view) {
                                         CustomProgess.OpenDialog(Gravity.CENTER, dialog);
-                                        CallAPI(seriphone, dateApi1.getText().toString().trim());
+                                        String textEDT = idEDInDay.getText().toString().trim();
+                                        String textTVdateAPI1 = dateApi1.getText().toString().trim();
+                                        if (textEDT.isEmpty()){
+                                            CustomProgess.CancleDialog(dialog);
+                                            idEDInDay.setError("Bạn chưa điền đủ thông tin!");
+                                        }
+                                        CallAPI(seriphone,textTVdateAPI1 );
                                     }
                                 });
                             }
@@ -291,6 +303,7 @@ public class FragmentMap extends Fragment {
                         radioButton_FromDay.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
+                                idTVDateLocation.setVisibility(View.INVISIBLE);
                                 idLLFiter.setVisibility(View.VISIBLE);
                                 idEDInDay.setVisibility(View.VISIBLE);
                                 idTVUndercore.setVisibility(View.VISIBLE);
@@ -318,7 +331,19 @@ public class FragmentMap extends Fragment {
                                     @Override
                                     public void onClick(View view) {
                                         CustomProgess.OpenDialog(Gravity.CENTER, dialog);
-                                        CallAPI2(seriphone, dateApi1.getText().toString().trim(), dateApi2.getText().toString().trim());
+                                        String textEDT1 = idEDInDay.getText().toString().trim();
+                                        String textEDT2 = idEDFromDay.getText().toString().trim();
+                                        String textTVdateAPI1 = dateApi1.getText().toString().trim();
+                                        String textTVdateAPI2 = dateApi2.getText().toString().trim();
+                                        if (textEDT1.isEmpty()){
+                                            CustomProgess.CancleDialog(dialog);
+                                            idEDInDay.setError("Bạn chưa điền đủ thông tin!");
+                                        }
+                                        if (textEDT2.isEmpty()){
+                                            CustomProgess.CancleDialog(dialog);
+                                            idEDFromDay.setError("Bạn chưa điền đủ thông tin!");
+                                        }
+                                        CallAPI2(seriphone, textTVdateAPI1, textTVdateAPI2);
                                     }
                                 });
                             }
@@ -338,6 +363,7 @@ public class FragmentMap extends Fragment {
                     try {
                         LocationRealTime location = snapshot.getValue(LocationRealTime.class);
                         if (location != null) {
+                            CustomProgess.CancleDialog(dialog);
                             String nameLocation = "";
                             myMarke.setPosition(new LatLng(Double.parseDouble(location.getLatitude()), Double.parseDouble(location.getLongtitude())));
                             Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
@@ -357,11 +383,23 @@ public class FragmentMap extends Fragment {
                             }
                             //xóa vị trí củ
                             mMap.clear();
-                            mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
-                                    .title(nameLocation)
-                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 18), 5000, null);
                             CustomProgess.CancleDialog(dialog);
+                            mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
+//                                    .title(nameLocation)
+                                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                            mMap.animateCamera(CameraUpdateFactory
+                                    .newLatLngZoom(myMarke.getPosition(), 15), 5000, null);
+                            String finalNameLocation = nameLocation;
+                            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                                @Override
+                                public boolean onMarkerClick(@NonNull Marker marker) {
+                                    idTVDateLocation.setVisibility(View.VISIBLE);
+                                    String dateLoction = "Ngày: "+location.getDateLog();
+                                    String nameLocation = "Địa chỉ: "+ finalNameLocation;
+                                    idTVDateLocation.setText(dateLoction+"\n"+nameLocation);
+                                    return false;
+                                }
+                            });
                         }
                     } catch (Exception e) {
                         Log.d("TAG", "onDataChange: " + e);
@@ -460,28 +498,24 @@ public class FragmentMap extends Fragment {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()).title(nameLocation));
+                mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()));
+                int finalI = i;
+                String finalNameLocation = nameLocation;
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(@NonNull Marker marker) {
+                        idTVDateLocation.setVisibility(View.VISIBLE);
+                        String dateLoction = "Ngày: "+mList.get(finalI).getDATE_LOG();
+                        String nameLocation = "Địa chỉ: "+finalNameLocation;
+                        idTVDateLocation.setText(dateLoction+"\n"+nameLocation);
+                        return false;
+                    }
+                });
             }
             CustomProgess.CancleDialog(dialog);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 18), 5000, null);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 15), 5000, null);
         }
     }
-
-    private Boolean checkEditext() {
-        String toDay = idEDInDay.getText().toString().trim();
-        String fromDay = idEDFromDay.getText().toString().trim();
-        if (toDay.isEmpty()) {
-            CustomProgess.CancleDialog(dialog);
-            idEDInDay.setError("Dữ liệu trống!");
-            return false;
-        } else if (fromDay.isEmpty()) {
-            CustomProgess.CancleDialog(dialog);
-            idEDFromDay.setError("Dữ liệu trống!");
-            return false;
-        }
-        return true;
-    }
-
     private void goToFragmentMenu() {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override

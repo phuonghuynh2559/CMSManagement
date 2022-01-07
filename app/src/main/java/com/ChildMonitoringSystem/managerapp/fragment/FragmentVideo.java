@@ -55,6 +55,7 @@ import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickVideoListener;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.ChildMonitoringSystem.managerapp.ui.NotifyProgess;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.normal.TedPermission;
 
@@ -65,14 +66,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragmentVideo extends Fragment {
+public class FragmentVideo extends NotifyProgess {
     private RecyclerView rcvVideo, rcv_InfoPhone;
     private View mView;
     private VideoAdapter videoAdapter;
     private VideoView videoView;
     private ImageView btnBack;
     private MainActivity mMainActivity;
-    private Dialog dialogProcesbar;
+    private Dialog dialogProcesbar, dialogDownloadTool;
     private ImageView idIVNoData;
     private InfomationPhoneAdapter infomationPhoneAdapter;
     private MyShareReference myShareReference;
@@ -104,6 +105,7 @@ public class FragmentVideo extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialogProcesbar = new Dialog(getContext());
+        dialogDownloadTool = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_video, container, false);
         myShareReference = new MyShareReference(getContext());
         phoneNumber = myShareReference.getValueString("phoneNumber");
@@ -138,7 +140,7 @@ public class FragmentVideo extends Fragment {
                 if (response.isSuccessful()) {
                     List<InfomationPhone> mList = response.body();
                     if (mList.size() == 0) {
-                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                        OpenDialogNotify(Gravity.CENTER,dialogDownloadTool);
                     } else {
                         infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
                             @Override

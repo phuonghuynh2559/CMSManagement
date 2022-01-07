@@ -47,6 +47,7 @@ import com.ChildMonitoringSystem.managerapp.my_interface.IClickImageListener;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.ChildMonitoringSystem.managerapp.ui.NotifyProgess;
 import com.bumptech.glide.Glide;
 
 import java.util.List;
@@ -55,7 +56,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragmentImages extends Fragment {
+public class FragmentImages extends NotifyProgess {
     private View mView;
     private RecyclerView rcvImage, rcv_InfoPhone;
     private ImagesAdapter imagesAdapter;
@@ -65,7 +66,7 @@ public class FragmentImages extends Fragment {
     private Button idBTGetImage;
 
     private MainActivity mMainActivity;
-    private Dialog dialog;
+    private Dialog dialog, dialogDownloadTool;
 
     private ImageView idIVNoData;
     private Dialog dialogProcesbar, dialogNotify;
@@ -80,6 +81,7 @@ public class FragmentImages extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialogProcesbar = new Dialog(getContext());
+        dialogDownloadTool = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_image, container, false);
 
         myShareReference = new MyShareReference(getContext());
@@ -117,7 +119,7 @@ public class FragmentImages extends Fragment {
                 if (response.isSuccessful()) {
                     List<InfomationPhone> mList = response.body();
                     if (mList.size() == 0) {
-                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                        OpenDialogNotify(Gravity.CENTER,dialogDownloadTool);
                     } else {
                         infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
                             @Override

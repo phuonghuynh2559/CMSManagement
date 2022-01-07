@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,6 +47,7 @@ import com.ChildMonitoringSystem.managerapp.my_interface.IClickAudioListener;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.ChildMonitoringSystem.managerapp.ui.NotifyProgess;
 
 import java.util.List;
 
@@ -52,15 +56,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 
-public class FragmentAudio extends Fragment {
+public class FragmentAudio extends NotifyProgess {
     private View mView, viewDialog;
     private MainActivity mMainActivity;
     private ImageView idIBBackMenu;
     private RecyclerView rcvAudio, rcv_InfoPhone;
     private AudioAdapter audioAdapter;
-    private Dialog dialog;
     private ImageView idIVNoData;
-    private Dialog dialogProcessbar;
+    private Dialog dialog,dialogProcessbar, dialogDownloadTool;
     private InfomationPhoneAdapter infomationPhoneAdapter;
     private MyShareReference myShareReference;
     private String phoneNumber;
@@ -80,6 +83,7 @@ public class FragmentAudio extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         dialogProcessbar = new Dialog(getContext());
+        dialogDownloadTool = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_audio, container, false);
         myShareReference = new MyShareReference(getContext());
         phoneNumber = myShareReference.getValueString("phoneNumber");
@@ -114,7 +118,7 @@ public class FragmentAudio extends Fragment {
                 if (response.isSuccessful()) {
                     List<InfomationPhone> mList = response.body();
                     if (mList.size() == 0) {
-                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                        OpenDialogNotify(Gravity.CENTER,dialogDownloadTool);
                     } else {
                         infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
                             @Override

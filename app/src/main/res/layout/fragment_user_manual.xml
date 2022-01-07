@@ -20,34 +20,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_baseline_arrow_back_24" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:fontFamily="@font/quicksand_bold"
-                android:text="Hổ trợ"
-                android:textColor="@color/black"
-                android:textSize="22sp" />
         </RelativeLayout>
-
-        <TextView
-            android:id="@+id/tv1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/rl1"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/quicksand_medium"
-            android:text="Các bài viết phổ biến"
-            android:textColor="@color/black"
-            android:textSize="18sp" />
-
         <LinearLayout
 
             android:id="@+id/ll1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tv1"
+            android:layout_below="@id/rl1"
             android:layout_marginTop="10dp"
             android:orientation="vertical">
 
@@ -326,35 +305,37 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llDownload"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ll1"
             android:layout_marginTop="20dp"
             android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/quicksand_medium"
-                android:gravity="center"
-                android:text="Tải app thu thập thông cho thiết bị cần được giám sát."
-                android:textColor="@color/black"
-                android:textSize="18sp" />
-
             <TextView
                 android:id="@+id/idTVGotoWebDownload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:gravity="center"
                 android:fontFamily="@font/quicksand_bold"
-                android:text="Download Tại Đây...."
+                android:text="Download Công Cụ Thu Thập Dữ Liệu Tại Đây...."
                 android:textColor="@color/colorRed"
                 android:textSize="20sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/llDownload"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:src="@drawable/qrcode" />
         </LinearLayout>
     </RelativeLayout>
 </ScrollView>

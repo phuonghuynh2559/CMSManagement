@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -12,6 +14,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -19,6 +24,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -37,6 +43,7 @@ import com.ChildMonitoringSystem.managerapp.models.InfomationPhone;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.ChildMonitoringSystem.managerapp.ui.NotifyProgess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,14 +52,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragmentContact extends Fragment {
+public class FragmentContact extends NotifyProgess {
     private View view;
     private RecyclerView rcv_contact,rcv_InfoPhone;
     private ContactAdapter contactAdapter;
     private ImageView btnBack;
     private MainActivity mMainActivity;
     private ImageView idIVNoData;
-    private Dialog dialog;
+    private Dialog dialog,dialogDownloadTool;
     private MyShareReference myShareReference;
     private String phoneNumber;
     private InfomationPhoneAdapter infomationPhoneAdapter;
@@ -60,6 +67,7 @@ public class FragmentContact extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialog = new Dialog(getContext());
+        dialogDownloadTool = new Dialog(getContext());
         view = inflater.inflate(R.layout.fragment_contact, container, false);
         myShareReference = new MyShareReference(getContext());
         phoneNumber = myShareReference.getValueString("phoneNumber");
@@ -95,7 +103,7 @@ public class FragmentContact extends Fragment {
                 if (response.isSuccessful()){
                     List<InfomationPhone>mList = response.body();
                     if (mList.size()==0){
-                        Toast.makeText(getContext(),"Không có máy giám sát nào!",Toast.LENGTH_SHORT).show();
+                        OpenDialogNotify(Gravity.CENTER,dialogDownloadTool);
                     }else{
                         infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
                             @Override
@@ -151,7 +159,6 @@ public class FragmentContact extends Fragment {
             }
         });
     }
-
     public void backFragmentBefore() {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -41,6 +41,7 @@ import com.ChildMonitoringSystem.managerapp.my_interface.IClickHistoryCall;
 import com.ChildMonitoringSystem.managerapp.my_interface.IClickInfomationPhone;
 import com.ChildMonitoringSystem.managerapp.sharereferen.MyShareReference;
 import com.ChildMonitoringSystem.managerapp.ui.CustomProgess;
+import com.ChildMonitoringSystem.managerapp.ui.NotifyProgess;
 
 import java.util.List;
 
@@ -48,7 +49,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FragmentCallLog extends Fragment {
+public class FragmentCallLog extends NotifyProgess {
     private View mView;
     private RecyclerView rcv_CallLog, rcv_InfoPhone;
     private CallLogAdapter callLogAdapter;
@@ -57,7 +58,7 @@ public class FragmentCallLog extends Fragment {
 
     private MainActivity mMainActivity;
     private ImageView idIVNoData;
-    private Dialog dialog;
+    private Dialog dialog, dialogDownloadTool;
     private MyShareReference myShareReference;
     private String phoneNumber;
 
@@ -65,6 +66,7 @@ public class FragmentCallLog extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         dialog = new Dialog(getContext());
+        dialogDownloadTool = new Dialog(getContext());
         mView = inflater.inflate(R.layout.fragment_history_call, container, false);
 
         myShareReference = new MyShareReference(getContext());
@@ -99,7 +101,7 @@ public class FragmentCallLog extends Fragment {
                 if (response.isSuccessful()) {
                     List<InfomationPhone> mList = response.body();
                     if (mList.size() == 0) {
-                        Toast.makeText(getContext(), "Không có máy giám sát nào!", Toast.LENGTH_SHORT).show();
+                        OpenDialogNotify(Gravity.CENTER,dialogDownloadTool);
                     } else {
                         infomationPhoneAdapter.setData(mList, new IClickInfomationPhone() {
                             @Override
