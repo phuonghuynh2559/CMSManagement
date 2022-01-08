@@ -385,7 +385,6 @@ public class FragmentMap extends NotifyProgess {
                             mMap.clear();
                             CustomProgess.CancleDialog(dialog);
                             mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
-//                                    .title(nameLocation)
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                             mMap.animateCamera(CameraUpdateFactory
                                     .newLatLngZoom(myMarke.getPosition(), 15), 5000, null);
@@ -444,7 +443,12 @@ public class FragmentMap extends NotifyProgess {
             public void onResponse(Call<List<LocationOffline>> call, Response<List<LocationOffline>> response) {
                 if (response.isSuccessful()) {
                     List<LocationOffline> mList = response.body();
-                    getApi(mList);
+                    if (mList.size()==0){
+                        CustomProgess.CancleDialog(dialog);
+                        Toast.makeText(getContext(),"Không có dữ liệu!",Toast.LENGTH_SHORT).show();
+                    }else {
+                        getApi(mList);
+                    }
                 }
             }
 
@@ -489,7 +493,6 @@ public class FragmentMap extends NotifyProgess {
                     if (addresses.size() > 0) {
                         for (Address adr : addresses) {
                             if (adr.getAddressLine(0) != null && adr.getAddressLine(0).length() > 0) {
-                                //String type = " Vị trí đã từng đi qua: ";
                                 nameLocation = adr.getAddressLine(0);
                                 break;
                             }
