@@ -220,6 +220,7 @@ public class RegisterActivity extends CustomProgess {
         @Override
         public void onVerificationFailed(@NonNull FirebaseException e) {
             Log.d("TAG", "onVerificationFailed: " + e.getMessage());
+            CancleDialog(dialog);
         }
 
         @Override

@@ -387,7 +387,7 @@ public class FragmentMap extends NotifyProgess {
                             mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
                             mMap.animateCamera(CameraUpdateFactory
-                                    .newLatLngZoom(myMarke.getPosition(), 15), 5000, null);
+                                    .newLatLngZoom(myMarke.getPosition(), 17), 5000, null);
                             String finalNameLocation = nameLocation;
                             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                                 @Override
@@ -516,7 +516,7 @@ public class FragmentMap extends NotifyProgess {
                 });
             }
             CustomProgess.CancleDialog(dialog);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 15), 5000, null);
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 17), 5000, null);
         }
     }
     private void goToFragmentMenu() {

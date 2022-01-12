@@ -1,0 +1,139 @@
+{
+  "project_info": {
+    "project_number": "361679989664",
+    "firebase_url": "https://sentopt-6ec05-default-rtdb.firebaseio.com",
+    "project_id": "sentopt-6ec05",
+    "storage_bucket": "sentopt-6ec05.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361679989664:android:84d59b6b8fdfdde164d2c5",
+        "android_client_info": {
+          "package_name": "com.ChildMonitoringSystem.CMS"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361679989664-981tr4a2l3lmh1djcophp1kvv6jr0dqa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ChildMonitoringSystem.CMS",
+            "certificate_hash": "49ed03f3b9fa0853343b9279d51b4d7aef768dc5"
+          }
+        },
+        {
+          "client_id": "361679989664-mur018tubt81v8l356e0rdfb8jrefd8o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ChildMonitoringSystem.CMS",
+            "certificate_hash": "e765914fe6d15cb29dea135fa7592a68ee56ba3d"
+          }
+        },
+        {
+          "client_id": "361679989664-nbmmsvc90oo2ub539i4mcn6h63cd85ru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmYAXTVlBnO21PNT1T1pKtVvTmYHrcGfk"
+        },
+        {
+          "current_key": "AIzaSyCGLh9rmSLv_O7GNJE7LKYJY7Md3CxH8L8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361679989664-nbmmsvc90oo2ub539i4mcn6h63cd85ru.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361679989664:android:d468e0ec080cdf3a64d2c5",
+        "android_client_info": {
+          "package_name": "com.ChildMonitoringSystem.managerapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361679989664-fmu0u5039ucqjl2164cuetvd13kqkanv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ChildMonitoringSystem.managerapp",
+            "certificate_hash": "e765914fe6d15cb29dea135fa7592a68ee56ba3d"
+          }
+        },
+        {
+          "client_id": "361679989664-nbmmsvc90oo2ub539i4mcn6h63cd85ru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmYAXTVlBnO21PNT1T1pKtVvTmYHrcGfk"
+        },
+        {
+          "current_key": "AIzaSyCGLh9rmSLv_O7GNJE7LKYJY7Md3CxH8L8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361679989664-nbmmsvc90oo2ub539i4mcn6h63cd85ru.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361679989664:android:4430cb1cc1866a2864d2c5",
+        "android_client_info": {
+          "package_name": "com.childmonitoringsystem.location"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361679989664-94jd18hsu7kvi5f4di5kf2omtlfnu3lm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.childmonitoringsystem.location",
+            "certificate_hash": "49ed03f3b9fa0853343b9279d51b4d7aef768dc5"
+          }
+        },
+        {
+          "client_id": "361679989664-nbmmsvc90oo2ub539i4mcn6h63cd85ru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDmYAXTVlBnO21PNT1T1pKtVvTmYHrcGfk"
+        },
+        {
+          "current_key": "AIzaSyCGLh9rmSLv_O7GNJE7LKYJY7Md3CxH8L8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361679989664-nbmmsvc90oo2ub539i4mcn6h63cd85ru.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

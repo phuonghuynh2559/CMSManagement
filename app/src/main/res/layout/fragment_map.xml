@@ -109,6 +109,7 @@
         android:orientation="horizontal">
 
         <EditText
+            android:hint="Chọn ngày"
             android:id="@+id/idEDInDay"
             android:layout_width="0dp"
             android:layout_height="45dp"
@@ -128,6 +129,7 @@
             android:textSize="50dp" />
 
         <EditText
+            android:hint="Chọn ngày"
             android:id="@+id/idEDFromDay"
             android:layout_width="0dp"
             android:layout_height="45dp"
