@@ -166,6 +166,8 @@ public class FragmentChangePassword extends Fragment {
                 if (response.isSuccessful()){
                     CustomProgess.CancleDialog(dialog);
                     Toast.makeText(getContext(), "Đổi thành công", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getContext(),LoginActivity.class);
+                    startActivity(intent);
                 }else{
                     Log.d("TAG", "onResponse: "+userRequest.toString());
                 }

@@ -2,6 +2,7 @@ package com.ChildMonitoringSystem.managerapp.fragment;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,7 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
@@ -47,6 +52,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -59,6 +65,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -478,46 +485,114 @@ public class FragmentMap extends NotifyProgess {
     }
 
     private void getApi(List<LocationOffline> mList) {
-
         if (mList.size() == 0) {
             Toast.makeText(getContext(), "Không có dữ liệu!", Toast.LENGTH_SHORT).show();
             CustomProgess.CancleDialog(dialog);
         } else {
-            for (int i = 0; i < mList.size(); i++) {
-                String nameLocation = "";
-                myMarke.setPosition(new LatLng(Double.parseDouble(mList.get(i).getLATITUDE()), Double.parseDouble(mList.get(i).getLONGTITUDE())));
-                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-                List<Address> addresses;
-                try {
-                    addresses = geocoder.getFromLocation(Double.parseDouble(mList.get(i).getLATITUDE()), Double.parseDouble(mList.get(i).getLONGTITUDE()), 10);
-                    if (addresses.size() > 0) {
-                        for (Address adr : addresses) {
-                            if (adr.getAddressLine(0) != null && adr.getAddressLine(0).length() > 0) {
-                                nameLocation = adr.getAddressLine(0);
-                                break;
-                            }
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+            int i;
+            for (i = 0 ; i < mList.size(); i++) {
+                String latitude = mList.get(i).getLATITUDE();
+                String longtitude = mList.get(i).getLONGTITUDE();
+                myMarke.setPosition(new LatLng(Double.parseDouble(latitude), Double.parseDouble(longtitude)));
+                if (i==0){
+                    mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
+                            .title(mList.get(i).getDATE_LOG())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+//                    mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()).title(mList.get(0).getDATE_LOG()).icon(BitmapFromVector(getContext(),R.drawable.ic_circle_start)));
+                }else if(i==mList.size() - 1)
+                {
+                    mMap.addMarker(new MarkerOptions().position(myMarke.getPosition())
+                            .title(mList.get(i).getDATE_LOG())
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
                 }
-                mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()));
-                int finalI = i;
-                String finalNameLocation = nameLocation;
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                    @Override
-                    public boolean onMarkerClick(@NonNull Marker marker) {
-                        idTVDateLocation.setVisibility(View.VISIBLE);
-                        String dateLoction = "Ngày: "+mList.get(finalI).getDATE_LOG();
-                        String nameLocation = "Địa chỉ: "+finalNameLocation;
-                        idTVDateLocation.setText(dateLoction+"\n"+nameLocation);
-                        return false;
-                    }
-                });
+                mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()).title(mList.get(i).getDATE_LOG()).icon(BitmapFromVector(getContext(),R.drawable.ic_circle)));
+                //mMap.addMarker(new MarkerOptions().position(myMarke.getPosition()).title(mList.get(i).getDATE_LOG()));
             }
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(@NonNull Marker marker) {
+                    idTVDateLocation.setVisibility(View.VISIBLE);
+                    String address = getAddress(String.valueOf(marker.getPosition().latitude),String.valueOf(marker.getPosition().longitude));
+                    idTVDateLocation.setText("Địa chỉ: "+address);
+                    return false;
+                }
+            });
             CustomProgess.CancleDialog(dialog);
-            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myMarke.getPosition(), 17), 5000, null);
+            mMap.animateCamera(CameraUpdateFactory
+                    .newLatLngZoom(myMarke.getPosition(), 17), 5000, null);
+
         }
+    }
+    private String getAddress(String latitude, String longtitude){
+        String nameLocation = "";
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(Double.parseDouble(latitude), Double.parseDouble(longtitude), 1);
+            if (addresses!=null){
+                Address retrurnAddress = addresses.get(0);
+                StringBuilder builder = new StringBuilder("");
+                for (int i = 0; i <= retrurnAddress.getMaxAddressLineIndex(); i++){
+                    builder.append(retrurnAddress.getAddressLine(i)).append("\n");
+                }
+                nameLocation = builder.toString();
+            }
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return nameLocation;
+    }
+//    private void showAddress(String latitude, String longtitude){
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(@NonNull Marker marker) {
+//                idTVDateLocation.setVisibility(View.VISIBLE);
+////                        String dateLoction = "Ngày: "+mList.get().getDATE_LOG();
+////                        String nameLocation = "Địa chỉ: "+finalNameLocation;
+////                        idTVDateLocation.setText(dateLoction+"\n"+nameLocation);
+//                String nameLocation = "";
+//                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+//                List<Address> addresses;
+//                try {
+//                    addresses = geocoder.getFromLocation(Double.parseDouble(latitude), Double.parseDouble(longtitude), 1);
+//                    if (addresses.size() > 0) {
+//                        for (int i = 0 ; i<addresses.get(0).getMaxAddressLineIndex();i++){
+//                            nameLocation += addresses.get(0).getAddressLine(i);
+//                        }
+//                        for (Address adr : addresses) {
+//                            if (adr.getAddressLine(0) != null && adr.getAddressLine(0).length() > 0) {
+//                                nameLocation = adr.getAddressLine(0);
+//                                break;
+//                            }
+//                        }
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                Log.d("Địa chỉ vị trí", "onMarkerClick: "+ latitude +" "+ longtitude+" "+ nameLocation);
+//                return false;
+//            }
+//        });
+//    }
+    private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
+        // below line is use to generate a drawable.
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+
+        // below line is use to set bounds to our vector drawable.
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+
+        // below line is use to create a bitmap for our
+        // drawable which we have added.
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+        // below line is use to add bitmap in our canvas.
+        Canvas canvas = new Canvas(bitmap);
+
+        // below line is use to draw our
+        // vector drawable in canvas.
+        vectorDrawable.draw(canvas);
+
+        // after generating our bitmap we are returning our bitmap.
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
     private void goToFragmentMenu() {
         btnBack.setOnClickListener(new View.OnClickListener() {
